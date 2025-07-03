@@ -818,7 +818,7 @@ const Signup: React.FC<SignupProps> = () => {
 
   if (signupComplete) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-6">
+      <div data-stack-public-page className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-6">
         <Card className="w-full max-w-md bg-gray-800/50 border-gray-700">
           <CardHeader className="text-center">
             <div className="mx-auto w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mb-4">

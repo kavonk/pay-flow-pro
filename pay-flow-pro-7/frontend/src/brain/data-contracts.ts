@@ -472,13 +472,13 @@ export interface Customer {
   /**
    * Created At
    * @format date-time
-   * @default "2025-07-03T10:59:55.981988Z"
+   * @default "2025-07-03T12:08:28.351244Z"
    */
   created_at?: string;
   /**
    * Updated At
    * @format date-time
-   * @default "2025-07-03T10:59:55.981990Z"
+   * @default "2025-07-03T12:08:28.351246Z"
    */
   updated_at?: string;
 }
@@ -816,13 +816,13 @@ export interface Invoice {
   /**
    * Created At
    * @format date-time
-   * @default "2025-07-03T10:59:55.982433Z"
+   * @default "2025-07-03T12:08:28.351735Z"
    */
   created_at?: string;
   /**
    * Updated At
    * @format date-time
-   * @default "2025-07-03T10:59:55.982435Z"
+   * @default "2025-07-03T12:08:28.351736Z"
    */
   updated_at?: string;
   customer?: Customer | null;
@@ -1137,7 +1137,7 @@ export interface Payment {
   /**
    * Timestamp
    * @format date-time
-   * @default "2025-07-03T10:59:55.983313Z"
+   * @default "2025-07-03T12:08:28.352554Z"
    */
   timestamp?: string;
   /** Stripe Payment Id */
@@ -1145,13 +1145,13 @@ export interface Payment {
   /**
    * Created At
    * @format date-time
-   * @default "2025-07-03T10:59:55.983315Z"
+   * @default "2025-07-03T12:08:28.352556Z"
    */
   created_at?: string;
   /**
    * Updated At
    * @format date-time
-   * @default "2025-07-03T10:59:55.983316Z"
+   * @default "2025-07-03T12:08:28.352557Z"
    */
   updated_at?: string;
   invoice?: Invoice | null;
@@ -1444,14 +1444,6 @@ export interface StartTrialRequest {
    * The slug of the plan to start a trial for.
    */
   plan_slug: string;
-  /** Payment Method Id */
-  payment_method_id?: string | null;
-  /** Stripe Customer Id */
-  stripe_customer_id?: string | null;
-  /** Card Last Four */
-  card_last_four?: string | null;
-  /** Card Brand */
-  card_brand?: string | null;
 }
 
 /** StripeBillingHistoryResponse */
@@ -2007,73 +1999,6 @@ export type JobHealthCheckData = any;
 
 export type GetStripeConfigData = AppApisConfigStripeConfigResponse;
 
-export type CreateCustomerEndpointData = CustomerResponse;
-
-export type CreateCustomerEndpointError = HTTPValidationError;
-
-export interface GetCustomersEndpointParams {
-  /**
-   * Page
-   * Page number
-   * @min 1
-   * @default 1
-   */
-  page?: number;
-  /**
-   * Limit
-   * Items per page
-   * @min 1
-   * @max 100
-   * @default 20
-   */
-  limit?: number;
-  /**
-   * Search
-   * Search term for name or email
-   */
-  search?: string | null;
-}
-
-export type GetCustomersEndpointData = CustomersListResponse;
-
-export type GetCustomersEndpointError = HTTPValidationError;
-
-export interface GetCustomerEndpointParams {
-  /**
-   * Customer Id
-   * @format uuid
-   */
-  customerId: string;
-}
-
-export type GetCustomerEndpointData = CustomerResponse;
-
-export type GetCustomerEndpointError = HTTPValidationError;
-
-export interface UpdateCustomerEndpointParams {
-  /**
-   * Customer Id
-   * @format uuid
-   */
-  customerId: string;
-}
-
-export type UpdateCustomerEndpointData = CustomerResponse;
-
-export type UpdateCustomerEndpointError = HTTPValidationError;
-
-export interface DeleteCustomerEndpointParams {
-  /**
-   * Customer Id
-   * @format uuid
-   */
-  customerId: string;
-}
-
-export type DeleteCustomerEndpointData = any;
-
-export type DeleteCustomerEndpointError = HTTPValidationError;
-
 export type GetExportStatsData = ExportStatsResponse;
 
 export interface ExportCustomersParams {
@@ -2553,6 +2478,169 @@ export type UpdateInvoicePrefixData = UpdatePrefixResponse;
 
 export type UpdateInvoicePrefixError = HTTPValidationError;
 
+export type RunDunningJobCronData = CronJobResult;
+
+export type RunDunningJobCronError = HTTPValidationError;
+
+export type RunTrialConversionJobCronData = CronJobResult;
+
+export type RunTrialConversionJobCronError = HTTPValidationError;
+
+export type CronJobsHealthCheckData = any;
+
+export type SendTrialRemindersCronData = CronJobResult;
+
+export type SendTrialRemindersCronError = HTTPValidationError;
+
+/** Response Get Public Subscription Plans */
+export type GetPublicSubscriptionPlansData = PublicSubscriptionPlanResponse[];
+
+/** Response Whoami */
+export type WhoamiData = Record<string, any>;
+
+export type GetPayoutsSettlementSummaryData = AppApisPayoutsSettlementSummary;
+
+export interface GetPayoutsTransfersParams {
+  /**
+   * Limit
+   * @default 10
+   */
+  limit?: number;
+}
+
+/** Response Get Payouts Transfers */
+export type GetPayoutsTransfersData = Transfer[];
+
+export type GetPayoutsTransfersError = HTTPValidationError;
+
+export type CreatePayoutsInstantPayoutData = InstantPayoutResponse;
+
+export type CreatePayoutsInstantPayoutError = HTTPValidationError;
+
+export interface GetPayoutsHistoryParams {
+  /**
+   * Limit
+   * @default 10
+   */
+  limit?: number;
+}
+
+/** Response Get Payouts History */
+export type GetPayoutsHistoryData = Payout[];
+
+export type GetPayoutsHistoryError = HTTPValidationError;
+
+export type GetSubscriptionStripeConfigData = AppApisSubscriptionsStripeConfigResponse;
+
+/** Response Get Current Subscription */
+export type GetCurrentSubscriptionData = UserSubscriptionResponse | null;
+
+export type CreateCheckoutSessionData = CheckoutSessionResponse;
+
+export type CreateCheckoutSessionError = HTTPValidationError;
+
+export type UpgradeSubscriptionData = UserSubscriptionResponse;
+
+export type UpgradeSubscriptionError = HTTPValidationError;
+
+export type CancelSubscriptionData = UserSubscriptionResponse;
+
+export type CancelSubscriptionError = HTTPValidationError;
+
+export interface GetBillingHistoryParams {
+  /**
+   * Limit
+   * @default 10
+   */
+  limit?: number;
+  /** Starting After */
+  starting_after?: string | null;
+}
+
+export type GetBillingHistoryData = BillingHistoryListResponse;
+
+export type GetBillingHistoryError = HTTPValidationError;
+
+export type CreateCustomerPortalData = CustomerPortalResponse;
+
+export type CreateCustomerPortalError = HTTPValidationError;
+
+/** Response Get Feature Access */
+export type GetFeatureAccessData = Record<string, any>;
+
+export type SubscriptionWebhookHandlerData = any;
+
+export type ConvertExpiredTrialsData = any;
+
+export type HealthCheckData = HealthStatus;
+
+export type CreateCustomerEndpointData = CustomerResponse;
+
+export type CreateCustomerEndpointError = HTTPValidationError;
+
+export interface GetCustomersEndpointParams {
+  /**
+   * Page
+   * Page number
+   * @min 1
+   * @default 1
+   */
+  page?: number;
+  /**
+   * Limit
+   * Items per page
+   * @min 1
+   * @max 100
+   * @default 20
+   */
+  limit?: number;
+  /**
+   * Search
+   * Search term for name or email
+   */
+  search?: string | null;
+}
+
+export type GetCustomersEndpointData = CustomersListResponse;
+
+export type GetCustomersEndpointError = HTTPValidationError;
+
+export interface GetCustomerEndpointParams {
+  /**
+   * Customer Id
+   * @format uuid
+   */
+  customerId: string;
+}
+
+export type GetCustomerEndpointData = CustomerResponse;
+
+export type GetCustomerEndpointError = HTTPValidationError;
+
+export interface UpdateCustomerEndpointParams {
+  /**
+   * Customer Id
+   * @format uuid
+   */
+  customerId: string;
+}
+
+export type UpdateCustomerEndpointData = CustomerResponse;
+
+export type UpdateCustomerEndpointError = HTTPValidationError;
+
+export interface DeleteCustomerEndpointParams {
+  /**
+   * Customer Id
+   * @format uuid
+   */
+  customerId: string;
+}
+
+export type DeleteCustomerEndpointData = any;
+
+export type DeleteCustomerEndpointError = HTTPValidationError;
+
 export type CreateInvoiceEndpointData = Invoice;
 
 export type CreateInvoiceEndpointError = HTTPValidationError;
@@ -2663,92 +2751,6 @@ export type SendInvoiceEndpointData = any;
 
 export type SendInvoiceEndpointError = HTTPValidationError;
 
-export type RunDunningJobCronData = CronJobResult;
-
-export type RunDunningJobCronError = HTTPValidationError;
-
-export type RunTrialConversionJobCronData = CronJobResult;
-
-export type RunTrialConversionJobCronError = HTTPValidationError;
-
-export type CronJobsHealthCheckData = any;
-
-export type SendTrialRemindersCronData = CronJobResult;
-
-export type SendTrialRemindersCronError = HTTPValidationError;
-
-/** Response Get Public Subscription Plans */
-export type GetPublicSubscriptionPlansData = PublicPlanResponse[];
-
-/** Response Whoami */
-export type WhoamiData = Record<string, any>;
-
-export type GetPayoutsSettlementSummaryData = AppApisPayoutsSettlementSummary;
-
-export interface GetPayoutsTransfersParams {
-  /**
-   * Limit
-   * @default 10
-   */
-  limit?: number;
-}
-
-/** Response Get Payouts Transfers */
-export type GetPayoutsTransfersData = Transfer[];
-
-export type GetPayoutsTransfersError = HTTPValidationError;
-
-export type CreatePayoutsInstantPayoutData = InstantPayoutResponse;
-
-export type CreatePayoutsInstantPayoutError = HTTPValidationError;
-
-export interface GetPayoutsHistoryParams {
-  /**
-   * Limit
-   * @default 10
-   */
-  limit?: number;
-}
-
-/** Response Get Payouts History */
-export type GetPayoutsHistoryData = Payout[];
-
-export type GetPayoutsHistoryError = HTTPValidationError;
-
-/** Response Get Dunning Rules */
-export type GetDunningRulesData = DunningRule[];
-
-export type CreateDunningRuleData = DunningRule;
-
-export type CreateDunningRuleError = HTTPValidationError;
-
-export interface GetDunningRuleParams {
-  /** Rule Id */
-  ruleId: string;
-}
-
-export type GetDunningRuleData = DunningRule;
-
-export type GetDunningRuleError = HTTPValidationError;
-
-export interface UpdateDunningRuleParams {
-  /** Rule Id */
-  ruleId: string;
-}
-
-export type UpdateDunningRuleData = DunningRule;
-
-export type UpdateDunningRuleError = HTTPValidationError;
-
-export interface DeleteDunningRuleParams {
-  /** Rule Id */
-  ruleId: string;
-}
-
-export type DeleteDunningRuleData = any;
-
-export type DeleteDunningRuleError = HTTPValidationError;
-
 export type GetFinancialStatsData = FinancialStatsResponse;
 
 export interface GetKpiSummaryParams {
@@ -2808,53 +2810,40 @@ export type GetTopCustomersError = HTTPValidationError;
 
 export type GetActivityFeedData = ActivityFeedResponse;
 
-export type GetSubscriptionStripeConfigData = AppApisSubscriptionsStripeConfigResponse;
+/** Response Get Dunning Rules */
+export type GetDunningRulesData = DunningRule[];
 
-/** Response Get Subscription Plans */
-export type GetSubscriptionPlansData = PublicSubscriptionPlanResponse[];
+export type CreateDunningRuleData = DunningRule;
 
-/** Response Get Current Subscription */
-export type GetCurrentSubscriptionData = UserSubscriptionResponse | null;
+export type CreateDunningRuleError = HTTPValidationError;
 
-export type StartTrialData = UserSubscriptionResponse;
-
-export type StartTrialError = HTTPValidationError;
-
-export type CreateCheckoutSessionData = CheckoutSessionResponse;
-
-export type CreateCheckoutSessionError = HTTPValidationError;
-
-export type UpgradeSubscriptionData = UserSubscriptionResponse;
-
-export type UpgradeSubscriptionError = HTTPValidationError;
-
-export type CancelSubscriptionData = UserSubscriptionResponse;
-
-export type CancelSubscriptionError = HTTPValidationError;
-
-export interface GetBillingHistoryParams {
-  /**
-   * Limit
-   * @default 10
-   */
-  limit?: number;
-  /** Starting After */
-  starting_after?: string | null;
+export interface GetDunningRuleParams {
+  /** Rule Id */
+  ruleId: string;
 }
 
-export type GetBillingHistoryData = BillingHistoryListResponse;
+export type GetDunningRuleData = DunningRule;
 
-export type GetBillingHistoryError = HTTPValidationError;
+export type GetDunningRuleError = HTTPValidationError;
 
-export type CreateCustomerPortalData = CustomerPortalResponse;
+export interface UpdateDunningRuleParams {
+  /** Rule Id */
+  ruleId: string;
+}
 
-export type CreateCustomerPortalError = HTTPValidationError;
+export type UpdateDunningRuleData = DunningRule;
 
-/** Response Get Feature Access */
-export type GetFeatureAccessData = Record<string, any>;
+export type UpdateDunningRuleError = HTTPValidationError;
 
-export type SubscriptionWebhookHandlerData = any;
+export interface DeleteDunningRuleParams {
+  /** Rule Id */
+  ruleId: string;
+}
 
-export type ConvertExpiredTrialsData = any;
+export type DeleteDunningRuleData = any;
 
-export type HealthCheckData = HealthStatus;
+export type DeleteDunningRuleError = HTTPValidationError;
+
+export type StartTrialNewData = any;
+
+export type StartTrialNewError = HTTPValidationError;

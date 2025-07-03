@@ -222,7 +222,7 @@ const Pricing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div data-stack-public-page className="min-h-screen bg-gray-900 text-white">
       {/* Header */}
       <div className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-6 py-4">

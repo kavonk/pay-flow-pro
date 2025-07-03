@@ -31,11 +31,9 @@ interface Props {
 export const AppProvider = ({ children }: Props) => {
   return (
     <QueryClientProvider client={queryClient}>
-      <UserGuard>
-        <Suspense fallback={<div>Loading...</div>}>
-          {children}
-        </Suspense>
-      </UserGuard>
+      <Suspense fallback={<div>Loading...</div>}>
+        {children}
+      </Suspense>
       <Toaster />
     </QueryClientProvider>
   );

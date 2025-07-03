@@ -126,17 +126,17 @@ export default function DashboardPage() {
   const { data: settlementSummary, isLoading: settlementLoading, error: settlementError } = useSettlementSummary(user?.id);
   const { subscription, featureAccess, loading: subscriptionLoading } = useSubscription(user?.id);
   
-  const isLoading = statsLoading || settlementLoading || subscriptionLoading;
+  const isLoading = statsLoading || settlementLoading || subscriptionLoading || !stats;
   const error = statsError; // Only consider stats errors since settlement 404s are expected
 
   const chartData = useMemo(() => {
     if (!stats?.invoice_summary) return [];
     const summary: InvoiceSummary = stats.invoice_summary;
     return [
-      { name: "Paid", count: summary.paid, fill: "hsl(var(--chart-2))" },
-      { name: "Sent", count: summary.sent, fill: "hsl(var(--chart-3))" },
-      { name: "Overdue", count: summary.overdue, fill: "hsl(var(--chart-5))" },
-      { name: "Draft", count: summary.draft, fill: "hsl(var(--muted-foreground))" },
+      { name: "Paid", count: summary.paid ?? 0, fill: "hsl(var(--chart-2))" },
+      { name: "Sent", count: summary.sent ?? 0, fill: "hsl(var(--chart-3))" },
+      { name: "Overdue", count: summary.overdue ?? 0, fill: "hsl(var(--chart-5))" },
+      { name: "Draft", count: summary.draft ?? 0, fill: "hsl(var(--muted-foreground))" },
     ];
   }, [stats]);
 
@@ -273,7 +273,11 @@ export default function DashboardPage() {
           </div>
         )}
         {!isLoading && !error && !stats && (
-          <div className="p-8">No data available.</div>
+            <div className="p-8 text-center text-muted-foreground">
+              <FileText className="h-12 w-12 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold">No invoice data yet</h3>
+              <p>Create your first invoice to see your dashboard populate with data.</p>
+            </div>
         )}
         {stats && (
           <>
@@ -420,7 +424,7 @@ export default function DashboardPage() {
               />
               <StatCard
                 title="Paid Invoices"
-                value={stats.invoice_summary.paid.toString()}
+                value={stats.invoice_summary?.paid?.toString() ?? '0'}
                 description="Number of fully paid invoices"
                 icon={CheckCircle}
                 clickable={true}
@@ -432,7 +436,7 @@ export default function DashboardPage() {
               />
               <StatCard
                 title="Overdue Invoices"
-                value={stats.invoice_summary.overdue.toString()}
+                value={stats.invoice_summary?.overdue?.toString() ?? '0'}
                 description="Number of invoices past their due date"
                 icon={Clock}
                 clickable={true}
@@ -561,7 +565,7 @@ export default function DashboardPage() {
                     <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
                     <span>Paid Invoices</span>
                     <span className="ml-auto font-semibold">
-                      {stats.invoice_summary.paid}
+                      {stats.invoice_summary?.paid ?? 0}
                     </span>
                   </div>
                   <div 
@@ -575,7 +579,7 @@ export default function DashboardPage() {
                     <Send className="h-4 w-4 mr-2 text-blue-500" />
                     <span>Sent Invoices</span>
                     <span className="ml-auto font-semibold">
-                      {stats.invoice_summary.sent}
+                      {stats.invoice_summary?.sent ?? 0}
                     </span>
                   </div>
                   <div 
@@ -589,7 +593,7 @@ export default function DashboardPage() {
                     <Clock className="h-4 w-4 mr-2 text-orange-500" />
                     <span>Overdue Invoices</span>
                     <span className="ml-auto font-semibold">
-                      {stats.invoice_summary.overdue}
+                      {stats.invoice_summary?.overdue ?? 0}
                     </span>
                   </div>
                   <div 
@@ -603,7 +607,7 @@ export default function DashboardPage() {
                     <FileText className="h-4 w-4 mr-2 text-gray-500" />
                     <span>Draft Invoices</span>
                     <span className="ml-auto font-semibold">
-                      {stats.invoice_summary.draft}
+                      {stats.invoice_summary?.draft ?? 0}
                     </span>
                   </div>
                 </CardContent>

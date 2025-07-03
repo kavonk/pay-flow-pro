@@ -165,7 +165,6 @@ import {
   GetRevenueOverTimeParams,
   GetSettlementSummaryData,
   GetStripeConfigData,
-  GetSubscriptionPlansData,
   GetSubscriptionStripeConfigData,
   GetTeamInvitationsData,
   GetTeamMembersData,
@@ -215,8 +214,8 @@ import {
   SendTrialRemindersCronError,
   SendTrialRemindersData,
   SendTrialRemindersError,
-  StartTrialData,
-  StartTrialError,
+  StartTrialNewData,
+  StartTrialNewError,
   StartTrialRequest,
   StripeWebhookHandlerData,
   StripeWebhookHandlerError,
@@ -326,90 +325,6 @@ export class Brain<SecurityDataType = unknown> extends HttpClient<SecurityDataTy
     this.request<GetStripeConfigData, any>({
       path: `/routes/stripe`,
       method: "GET",
-      ...params,
-    });
-
-  /**
-   * @description Create a new customer.
-   *
-   * @tags dbtn/module:customers, dbtn/hasAuth
-   * @name create_customer_endpoint
-   * @summary Create Customer Endpoint
-   * @request POST:/routes/customers/
-   */
-  create_customer_endpoint = (data: CreateCustomerRequest, params: RequestParams = {}) =>
-    this.request<CreateCustomerEndpointData, CreateCustomerEndpointError>({
-      path: `/routes/customers/`,
-      method: "POST",
-      body: data,
-      type: ContentType.Json,
-      ...params,
-    });
-
-  /**
-   * @description Get list of customers with pagination and optional search.
-   *
-   * @tags dbtn/module:customers, dbtn/hasAuth
-   * @name get_customers_endpoint
-   * @summary Get Customers Endpoint
-   * @request GET:/routes/customers/
-   */
-  get_customers_endpoint = (query: GetCustomersEndpointParams, params: RequestParams = {}) =>
-    this.request<GetCustomersEndpointData, GetCustomersEndpointError>({
-      path: `/routes/customers/`,
-      method: "GET",
-      query: query,
-      ...params,
-    });
-
-  /**
-   * @description Get a specific customer by ID.
-   *
-   * @tags dbtn/module:customers, dbtn/hasAuth
-   * @name get_customer_endpoint
-   * @summary Get Customer Endpoint
-   * @request GET:/routes/customers/{customer_id}
-   */
-  get_customer_endpoint = ({ customerId, ...query }: GetCustomerEndpointParams, params: RequestParams = {}) =>
-    this.request<GetCustomerEndpointData, GetCustomerEndpointError>({
-      path: `/routes/customers/${customerId}`,
-      method: "GET",
-      ...params,
-    });
-
-  /**
-   * @description Update an existing customer.
-   *
-   * @tags dbtn/module:customers, dbtn/hasAuth
-   * @name update_customer_endpoint
-   * @summary Update Customer Endpoint
-   * @request PUT:/routes/customers/{customer_id}
-   */
-  update_customer_endpoint = (
-    { customerId, ...query }: UpdateCustomerEndpointParams,
-    data: UpdateCustomerRequest,
-    params: RequestParams = {},
-  ) =>
-    this.request<UpdateCustomerEndpointData, UpdateCustomerEndpointError>({
-      path: `/routes/customers/${customerId}`,
-      method: "PUT",
-      body: data,
-      type: ContentType.Json,
-      ...params,
-    });
-
-  /**
-   * @description Delete a customer.
-   *
-   * @tags dbtn/module:customers, dbtn/hasAuth
-   * @name delete_customer_endpoint
-   * @summary Delete Customer Endpoint
-   * @request DELETE:/routes/customers/{customer_id}
-   */
-  delete_customer_endpoint = ({ customerId, ...query }: DeleteCustomerEndpointParams, params: RequestParams = {}) =>
-    this.request<DeleteCustomerEndpointData, DeleteCustomerEndpointError>({
-      path: `/routes/customers/${customerId}`,
-      method: "DELETE",
       ...params,
     });
 
@@ -1412,107 +1327,6 @@ export class Brain<SecurityDataType = unknown> extends HttpClient<SecurityDataTy
     });
 
   /**
-   * @description Creates a new invoice.
-   *
-   * @tags dbtn/module:invoices, dbtn/hasAuth
-   * @name create_invoice_endpoint
-   * @summary Create Invoice Endpoint
-   * @request POST:/routes/invoices/invoices
-   */
-  create_invoice_endpoint = (data: CreateInvoiceRequest, params: RequestParams = {}) =>
-    this.request<CreateInvoiceEndpointData, CreateInvoiceEndpointError>({
-      path: `/routes/invoices/invoices`,
-      method: "POST",
-      body: data,
-      type: ContentType.Json,
-      ...params,
-    });
-
-  /**
-   * @description Get a paginated and sortable list of invoices.
-   *
-   * @tags dbtn/module:invoices, dbtn/hasAuth
-   * @name get_invoices_endpoint
-   * @summary Get Invoices Endpoint
-   * @request GET:/routes/invoices/
-   */
-  get_invoices_endpoint = (query: GetInvoicesEndpointParams, params: RequestParams = {}) =>
-    this.request<GetInvoicesEndpointData, GetInvoicesEndpointError>({
-      path: `/routes/invoices/`,
-      method: "GET",
-      query: query,
-      ...params,
-    });
-
-  /**
-   * @description Gets a single invoice by its ID.
-   *
-   * @tags dbtn/module:invoices, dbtn/hasAuth
-   * @name get_invoice_endpoint
-   * @summary Get Invoice Endpoint
-   * @request GET:/routes/invoices/invoices/{invoice_id}
-   */
-  get_invoice_endpoint = ({ invoiceId, ...query }: GetInvoiceEndpointParams, params: RequestParams = {}) =>
-    this.request<GetInvoiceEndpointData, GetInvoiceEndpointError>({
-      path: `/routes/invoices/invoices/${invoiceId}`,
-      method: "GET",
-      ...params,
-    });
-
-  /**
-   * @description Update an existing invoice.
-   *
-   * @tags dbtn/module:invoices, dbtn/hasAuth
-   * @name update_invoice_endpoint
-   * @summary Update Invoice Endpoint
-   * @request PUT:/routes/invoices/{invoice_id}
-   */
-  update_invoice_endpoint = (
-    { invoiceId, ...query }: UpdateInvoiceEndpointParams,
-    data: UpdateInvoiceRequest,
-    params: RequestParams = {},
-  ) =>
-    this.request<UpdateInvoiceEndpointData, UpdateInvoiceEndpointError>({
-      path: `/routes/invoices/${invoiceId}`,
-      method: "PUT",
-      body: data,
-      type: ContentType.Json,
-      ...params,
-    });
-
-  /**
-   * @description Delete an invoice.
-   *
-   * @tags dbtn/module:invoices, dbtn/hasAuth
-   * @name delete_invoice_endpoint
-   * @summary Delete Invoice Endpoint
-   * @request DELETE:/routes/invoices/{invoice_id}
-   */
-  delete_invoice_endpoint = ({ invoiceId, ...query }: DeleteInvoiceEndpointParams, params: RequestParams = {}) =>
-    this.request<DeleteInvoiceEndpointData, DeleteInvoiceEndpointError>({
-      path: `/routes/invoices/${invoiceId}`,
-      method: "DELETE",
-      ...params,
-    });
-
-  /**
-   * @description Send invoice via email to customer.
-   *
-   * @tags dbtn/module:invoices, dbtn/hasAuth
-   * @name send_invoice_endpoint
-   * @summary Send Invoice Endpoint
-   * @request POST:/routes/invoices/send
-   */
-  send_invoice_endpoint = (data: SendInvoiceRequest, params: RequestParams = {}) =>
-    this.request<SendInvoiceEndpointData, SendInvoiceEndpointError>({
-      path: `/routes/invoices/send`,
-      method: "POST",
-      body: data,
-      type: ContentType.Json,
-      ...params,
-    });
-
-  /**
    * @description Run the dunning job to send automated reminders.
    *
    * @tags dbtn/module:cron_jobs, dbtn/hasAuth
@@ -1573,9 +1387,9 @@ export class Brain<SecurityDataType = unknown> extends HttpClient<SecurityDataTy
     });
 
   /**
-   * @description Get all available subscription plans with full feature details. This endpoint is public and does not require authentication.
+   * @description Get all available subscription plans directly from the PLANS constant.
    *
-   * @tags Public Data, dbtn/module:public_data, dbtn/hasAuth
+   * @tags dbtn/module:public_subscriptions, dbtn/hasAuth
    * @name get_public_subscription_plans
    * @summary Get Public Subscription Plans
    * @request GET:/routes/public/plans
@@ -1667,199 +1481,6 @@ export class Brain<SecurityDataType = unknown> extends HttpClient<SecurityDataTy
     });
 
   /**
-   * No description
-   *
-   * @tags Dunning, dbtn/module:dunning, dbtn/hasAuth
-   * @name get_dunning_rules
-   * @summary Get Dunning Rules
-   * @request GET:/routes/dunning/rules
-   */
-  get_dunning_rules = (params: RequestParams = {}) =>
-    this.request<GetDunningRulesData, any>({
-      path: `/routes/dunning/rules`,
-      method: "GET",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Dunning, dbtn/module:dunning, dbtn/hasAuth
-   * @name create_dunning_rule
-   * @summary Create Dunning Rule
-   * @request POST:/routes/dunning/rules
-   */
-  create_dunning_rule = (data: DunningRule, params: RequestParams = {}) =>
-    this.request<CreateDunningRuleData, CreateDunningRuleError>({
-      path: `/routes/dunning/rules`,
-      method: "POST",
-      body: data,
-      type: ContentType.Json,
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Dunning, dbtn/module:dunning, dbtn/hasAuth
-   * @name get_dunning_rule
-   * @summary Get Dunning Rule
-   * @request GET:/routes/dunning/rules/{rule_id}
-   */
-  get_dunning_rule = ({ ruleId, ...query }: GetDunningRuleParams, params: RequestParams = {}) =>
-    this.request<GetDunningRuleData, GetDunningRuleError>({
-      path: `/routes/dunning/rules/${ruleId}`,
-      method: "GET",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Dunning, dbtn/module:dunning, dbtn/hasAuth
-   * @name update_dunning_rule
-   * @summary Update Dunning Rule
-   * @request PUT:/routes/dunning/rules/{rule_id}
-   */
-  update_dunning_rule = (
-    { ruleId, ...query }: UpdateDunningRuleParams,
-    data: DunningRule,
-    params: RequestParams = {},
-  ) =>
-    this.request<UpdateDunningRuleData, UpdateDunningRuleError>({
-      path: `/routes/dunning/rules/${ruleId}`,
-      method: "PUT",
-      body: data,
-      type: ContentType.Json,
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Dunning, dbtn/module:dunning, dbtn/hasAuth
-   * @name delete_dunning_rule
-   * @summary Delete Dunning Rule
-   * @request DELETE:/routes/dunning/rules/{rule_id}
-   */
-  delete_dunning_rule = ({ ruleId, ...query }: DeleteDunningRuleParams, params: RequestParams = {}) =>
-    this.request<DeleteDunningRuleData, DeleteDunningRuleError>({
-      path: `/routes/dunning/rules/${ruleId}`,
-      method: "DELETE",
-      ...params,
-    });
-
-  /**
-   * @description Returns the core financial stats for the main dashboard view. Combines total revenue/outstanding with invoice status counts.
-   *
-   * @tags dbtn/module:dashboard, dbtn/hasAuth
-   * @name get_financial_stats
-   * @summary Get Core Financial Stats
-   * @request GET:/routes/financial-stats
-   */
-  get_financial_stats = (params: RequestParams = {}) =>
-    this.request<GetFinancialStatsData, any>({
-      path: `/routes/financial-stats`,
-      method: "GET",
-      ...params,
-    });
-
-  /**
-   * @description Calculates and returns key performance indicators for the dashboard.
-   *
-   * @tags dbtn/module:dashboard, dbtn/hasAuth
-   * @name get_kpi_summary
-   * @summary Get Kpi Summary
-   * @request GET:/routes/kpi-summary
-   */
-  get_kpi_summary = (query: GetKpiSummaryParams, params: RequestParams = {}) =>
-    this.request<GetKpiSummaryData, GetKpiSummaryError>({
-      path: `/routes/kpi-summary`,
-      method: "GET",
-      query: query,
-      ...params,
-    });
-
-  /**
-   * @description Returns revenue data over a specified time period.
-   *
-   * @tags dbtn/module:dashboard, dbtn/hasAuth
-   * @name get_revenue_over_time
-   * @summary Get Revenue Over Time
-   * @request GET:/routes/revenue-over-time
-   */
-  get_revenue_over_time = (query: GetRevenueOverTimeParams, params: RequestParams = {}) =>
-    this.request<GetRevenueOverTimeData, GetRevenueOverTimeError>({
-      path: `/routes/revenue-over-time`,
-      method: "GET",
-      query: query,
-      ...params,
-    });
-
-  /**
-   * @description Returns the breakdown of invoices by status.
-   *
-   * @tags dbtn/module:dashboard, dbtn/hasAuth
-   * @name get_invoice_status_breakdown
-   * @summary Get Invoice Status Breakdown
-   * @request GET:/routes/invoice-status-breakdown
-   */
-  get_invoice_status_breakdown = (query: GetInvoiceStatusBreakdownParams, params: RequestParams = {}) =>
-    this.request<GetInvoiceStatusBreakdownData, GetInvoiceStatusBreakdownError>({
-      path: `/routes/invoice-status-breakdown`,
-      method: "GET",
-      query: query,
-      ...params,
-    });
-
-  /**
-   * @description Returns settlement summary data.
-   *
-   * @tags dbtn/module:dashboard, dbtn/hasAuth
-   * @name get_dashboard_settlement_summary
-   * @summary Get Dashboard Settlement Summary
-   * @request GET:/routes/dashboard-settlement-summary
-   */
-  get_dashboard_settlement_summary = (query: GetDashboardSettlementSummaryParams, params: RequestParams = {}) =>
-    this.request<GetDashboardSettlementSummaryData, GetDashboardSettlementSummaryError>({
-      path: `/routes/dashboard-settlement-summary`,
-      method: "GET",
-      query: query,
-      ...params,
-    });
-
-  /**
-   * @description Returns top 5 customers by revenue.
-   *
-   * @tags dbtn/module:dashboard, dbtn/hasAuth
-   * @name get_top_customers
-   * @summary Get Top Customers
-   * @request GET:/routes/top-customers
-   */
-  get_top_customers = (query: GetTopCustomersParams, params: RequestParams = {}) =>
-    this.request<GetTopCustomersData, GetTopCustomersError>({
-      path: `/routes/top-customers`,
-      method: "GET",
-      query: query,
-      ...params,
-    });
-
-  /**
-   * @description Returns the recent activity feed.
-   *
-   * @tags dbtn/module:dashboard, dbtn/hasAuth
-   * @name get_activity_feed
-   * @summary Get Activity Feed
-   * @request GET:/routes/activity-feed
-   */
-  get_activity_feed = (params: RequestParams = {}) =>
-    this.request<GetActivityFeedData, any>({
-      path: `/routes/activity-feed`,
-      method: "GET",
-      ...params,
-    });
-
-  /**
    * @description Get Stripe configuration for subscription management.
    *
    * @tags dbtn/module:subscriptions, dbtn/hasAuth
@@ -1870,21 +1491,6 @@ export class Brain<SecurityDataType = unknown> extends HttpClient<SecurityDataTy
   get_subscription_stripe_config = (params: RequestParams = {}) =>
     this.request<GetSubscriptionStripeConfigData, any>({
       path: `/routes/config`,
-      method: "GET",
-      ...params,
-    });
-
-  /**
-   * @description Get all available subscription plans directly from the PLANS constant.
-   *
-   * @tags dbtn/module:subscriptions, dbtn/hasAuth
-   * @name get_subscription_plans
-   * @summary Get Subscription Plans
-   * @request GET:/routes/plans
-   */
-  get_subscription_plans = (params: RequestParams = {}) =>
-    this.request<GetSubscriptionPlansData, any>({
-      path: `/routes/plans`,
       method: "GET",
       ...params,
     });
@@ -1901,23 +1507,6 @@ export class Brain<SecurityDataType = unknown> extends HttpClient<SecurityDataTy
     this.request<GetCurrentSubscriptionData, any>({
       path: `/routes/current`,
       method: "GET",
-      ...params,
-    });
-
-  /**
-   * @description Start a free trial for a new user (now works for all users).
-   *
-   * @tags dbtn/module:subscriptions, dbtn/hasAuth
-   * @name start_trial
-   * @summary Start Trial
-   * @request POST:/routes/start-trial
-   */
-  start_trial = (data: StartTrialRequest, params: RequestParams = {}) =>
-    this.request<StartTrialData, StartTrialError>({
-      path: `/routes/start-trial`,
-      method: "POST",
-      body: data,
-      type: ContentType.Json,
       ...params,
     });
 
@@ -2062,6 +1651,401 @@ export class Brain<SecurityDataType = unknown> extends HttpClient<SecurityDataTy
     this.request<HealthCheckData, any>({
       path: `/routes/health-check`,
       method: "GET",
+      ...params,
+    });
+
+  /**
+   * @description Create a new customer.
+   *
+   * @tags dbtn/module:customers, dbtn/hasAuth
+   * @name create_customer_endpoint
+   * @summary Create Customer Endpoint
+   * @request POST:/routes/customers/
+   */
+  create_customer_endpoint = (data: CreateCustomerRequest, params: RequestParams = {}) =>
+    this.request<CreateCustomerEndpointData, CreateCustomerEndpointError>({
+      path: `/routes/customers/`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
+      ...params,
+    });
+
+  /**
+   * @description Get list of customers with pagination and optional search.
+   *
+   * @tags dbtn/module:customers, dbtn/hasAuth
+   * @name get_customers_endpoint
+   * @summary Get Customers Endpoint
+   * @request GET:/routes/customers/
+   */
+  get_customers_endpoint = (query: GetCustomersEndpointParams, params: RequestParams = {}) =>
+    this.request<GetCustomersEndpointData, GetCustomersEndpointError>({
+      path: `/routes/customers/`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+
+  /**
+   * @description Get a specific customer by ID.
+   *
+   * @tags dbtn/module:customers, dbtn/hasAuth
+   * @name get_customer_endpoint
+   * @summary Get Customer Endpoint
+   * @request GET:/routes/customers/{customer_id}
+   */
+  get_customer_endpoint = ({ customerId, ...query }: GetCustomerEndpointParams, params: RequestParams = {}) =>
+    this.request<GetCustomerEndpointData, GetCustomerEndpointError>({
+      path: `/routes/customers/${customerId}`,
+      method: "GET",
+      ...params,
+    });
+
+  /**
+   * @description Update an existing customer.
+   *
+   * @tags dbtn/module:customers, dbtn/hasAuth
+   * @name update_customer_endpoint
+   * @summary Update Customer Endpoint
+   * @request PUT:/routes/customers/{customer_id}
+   */
+  update_customer_endpoint = (
+    { customerId, ...query }: UpdateCustomerEndpointParams,
+    data: UpdateCustomerRequest,
+    params: RequestParams = {},
+  ) =>
+    this.request<UpdateCustomerEndpointData, UpdateCustomerEndpointError>({
+      path: `/routes/customers/${customerId}`,
+      method: "PUT",
+      body: data,
+      type: ContentType.Json,
+      ...params,
+    });
+
+  /**
+   * @description Delete a customer.
+   *
+   * @tags dbtn/module:customers, dbtn/hasAuth
+   * @name delete_customer_endpoint
+   * @summary Delete Customer Endpoint
+   * @request DELETE:/routes/customers/{customer_id}
+   */
+  delete_customer_endpoint = ({ customerId, ...query }: DeleteCustomerEndpointParams, params: RequestParams = {}) =>
+    this.request<DeleteCustomerEndpointData, DeleteCustomerEndpointError>({
+      path: `/routes/customers/${customerId}`,
+      method: "DELETE",
+      ...params,
+    });
+
+  /**
+   * @description Creates a new invoice.
+   *
+   * @tags dbtn/module:invoices, dbtn/hasAuth
+   * @name create_invoice_endpoint
+   * @summary Create Invoice Endpoint
+   * @request POST:/routes/invoices/invoices
+   */
+  create_invoice_endpoint = (data: CreateInvoiceRequest, params: RequestParams = {}) =>
+    this.request<CreateInvoiceEndpointData, CreateInvoiceEndpointError>({
+      path: `/routes/invoices/invoices`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
+      ...params,
+    });
+
+  /**
+   * @description Get a paginated and sortable list of invoices.
+   *
+   * @tags dbtn/module:invoices, dbtn/hasAuth
+   * @name get_invoices_endpoint
+   * @summary Get Invoices Endpoint
+   * @request GET:/routes/invoices/
+   */
+  get_invoices_endpoint = (query: GetInvoicesEndpointParams, params: RequestParams = {}) =>
+    this.request<GetInvoicesEndpointData, GetInvoicesEndpointError>({
+      path: `/routes/invoices/`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+
+  /**
+   * @description Gets a single invoice by its ID.
+   *
+   * @tags dbtn/module:invoices, dbtn/hasAuth
+   * @name get_invoice_endpoint
+   * @summary Get Invoice Endpoint
+   * @request GET:/routes/invoices/invoices/{invoice_id}
+   */
+  get_invoice_endpoint = ({ invoiceId, ...query }: GetInvoiceEndpointParams, params: RequestParams = {}) =>
+    this.request<GetInvoiceEndpointData, GetInvoiceEndpointError>({
+      path: `/routes/invoices/invoices/${invoiceId}`,
+      method: "GET",
+      ...params,
+    });
+
+  /**
+   * @description Update an existing invoice.
+   *
+   * @tags dbtn/module:invoices, dbtn/hasAuth
+   * @name update_invoice_endpoint
+   * @summary Update Invoice Endpoint
+   * @request PUT:/routes/invoices/{invoice_id}
+   */
+  update_invoice_endpoint = (
+    { invoiceId, ...query }: UpdateInvoiceEndpointParams,
+    data: UpdateInvoiceRequest,
+    params: RequestParams = {},
+  ) =>
+    this.request<UpdateInvoiceEndpointData, UpdateInvoiceEndpointError>({
+      path: `/routes/invoices/${invoiceId}`,
+      method: "PUT",
+      body: data,
+      type: ContentType.Json,
+      ...params,
+    });
+
+  /**
+   * @description Delete an invoice.
+   *
+   * @tags dbtn/module:invoices, dbtn/hasAuth
+   * @name delete_invoice_endpoint
+   * @summary Delete Invoice Endpoint
+   * @request DELETE:/routes/invoices/{invoice_id}
+   */
+  delete_invoice_endpoint = ({ invoiceId, ...query }: DeleteInvoiceEndpointParams, params: RequestParams = {}) =>
+    this.request<DeleteInvoiceEndpointData, DeleteInvoiceEndpointError>({
+      path: `/routes/invoices/${invoiceId}`,
+      method: "DELETE",
+      ...params,
+    });
+
+  /**
+   * @description Send invoice via email to customer.
+   *
+   * @tags dbtn/module:invoices, dbtn/hasAuth
+   * @name send_invoice_endpoint
+   * @summary Send Invoice Endpoint
+   * @request POST:/routes/invoices/send
+   */
+  send_invoice_endpoint = (data: SendInvoiceRequest, params: RequestParams = {}) =>
+    this.request<SendInvoiceEndpointData, SendInvoiceEndpointError>({
+      path: `/routes/invoices/send`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
+      ...params,
+    });
+
+  /**
+   * @description Returns the core financial stats for the main dashboard view. Combines total revenue/outstanding with invoice status counts.
+   *
+   * @tags dbtn/module:dashboard, dbtn/hasAuth
+   * @name get_financial_stats
+   * @summary Get Core Financial Stats
+   * @request GET:/routes/financial-stats
+   */
+  get_financial_stats = (params: RequestParams = {}) =>
+    this.request<GetFinancialStatsData, any>({
+      path: `/routes/financial-stats`,
+      method: "GET",
+      ...params,
+    });
+
+  /**
+   * @description Calculates and returns key performance indicators for the dashboard.
+   *
+   * @tags dbtn/module:dashboard, dbtn/hasAuth
+   * @name get_kpi_summary
+   * @summary Get Kpi Summary
+   * @request GET:/routes/kpi-summary
+   */
+  get_kpi_summary = (query: GetKpiSummaryParams, params: RequestParams = {}) =>
+    this.request<GetKpiSummaryData, GetKpiSummaryError>({
+      path: `/routes/kpi-summary`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+
+  /**
+   * @description Returns revenue data over a specified time period.
+   *
+   * @tags dbtn/module:dashboard, dbtn/hasAuth
+   * @name get_revenue_over_time
+   * @summary Get Revenue Over Time
+   * @request GET:/routes/revenue-over-time
+   */
+  get_revenue_over_time = (query: GetRevenueOverTimeParams, params: RequestParams = {}) =>
+    this.request<GetRevenueOverTimeData, GetRevenueOverTimeError>({
+      path: `/routes/revenue-over-time`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+
+  /**
+   * @description Returns the breakdown of invoices by status.
+   *
+   * @tags dbtn/module:dashboard, dbtn/hasAuth
+   * @name get_invoice_status_breakdown
+   * @summary Get Invoice Status Breakdown
+   * @request GET:/routes/invoice-status-breakdown
+   */
+  get_invoice_status_breakdown = (query: GetInvoiceStatusBreakdownParams, params: RequestParams = {}) =>
+    this.request<GetInvoiceStatusBreakdownData, GetInvoiceStatusBreakdownError>({
+      path: `/routes/invoice-status-breakdown`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+
+  /**
+   * @description Returns settlement summary data.
+   *
+   * @tags dbtn/module:dashboard, dbtn/hasAuth
+   * @name get_dashboard_settlement_summary
+   * @summary Get Dashboard Settlement Summary
+   * @request GET:/routes/dashboard-settlement-summary
+   */
+  get_dashboard_settlement_summary = (query: GetDashboardSettlementSummaryParams, params: RequestParams = {}) =>
+    this.request<GetDashboardSettlementSummaryData, GetDashboardSettlementSummaryError>({
+      path: `/routes/dashboard-settlement-summary`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+
+  /**
+   * @description Returns top 5 customers by revenue.
+   *
+   * @tags dbtn/module:dashboard, dbtn/hasAuth
+   * @name get_top_customers
+   * @summary Get Top Customers
+   * @request GET:/routes/top-customers
+   */
+  get_top_customers = (query: GetTopCustomersParams, params: RequestParams = {}) =>
+    this.request<GetTopCustomersData, GetTopCustomersError>({
+      path: `/routes/top-customers`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+
+  /**
+   * @description Returns the recent activity feed.
+   *
+   * @tags dbtn/module:dashboard, dbtn/hasAuth
+   * @name get_activity_feed
+   * @summary Get Activity Feed
+   * @request GET:/routes/activity-feed
+   */
+  get_activity_feed = (params: RequestParams = {}) =>
+    this.request<GetActivityFeedData, any>({
+      path: `/routes/activity-feed`,
+      method: "GET",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Dunning, dbtn/module:dunning, dbtn/hasAuth
+   * @name get_dunning_rules
+   * @summary Get Dunning Rules
+   * @request GET:/routes/dunning/rules
+   */
+  get_dunning_rules = (params: RequestParams = {}) =>
+    this.request<GetDunningRulesData, any>({
+      path: `/routes/dunning/rules`,
+      method: "GET",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Dunning, dbtn/module:dunning, dbtn/hasAuth
+   * @name create_dunning_rule
+   * @summary Create Dunning Rule
+   * @request POST:/routes/dunning/rules
+   */
+  create_dunning_rule = (data: DunningRule, params: RequestParams = {}) =>
+    this.request<CreateDunningRuleData, CreateDunningRuleError>({
+      path: `/routes/dunning/rules`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Dunning, dbtn/module:dunning, dbtn/hasAuth
+   * @name get_dunning_rule
+   * @summary Get Dunning Rule
+   * @request GET:/routes/dunning/rules/{rule_id}
+   */
+  get_dunning_rule = ({ ruleId, ...query }: GetDunningRuleParams, params: RequestParams = {}) =>
+    this.request<GetDunningRuleData, GetDunningRuleError>({
+      path: `/routes/dunning/rules/${ruleId}`,
+      method: "GET",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Dunning, dbtn/module:dunning, dbtn/hasAuth
+   * @name update_dunning_rule
+   * @summary Update Dunning Rule
+   * @request PUT:/routes/dunning/rules/{rule_id}
+   */
+  update_dunning_rule = (
+    { ruleId, ...query }: UpdateDunningRuleParams,
+    data: DunningRule,
+    params: RequestParams = {},
+  ) =>
+    this.request<UpdateDunningRuleData, UpdateDunningRuleError>({
+      path: `/routes/dunning/rules/${ruleId}`,
+      method: "PUT",
+      body: data,
+      type: ContentType.Json,
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Dunning, dbtn/module:dunning, dbtn/hasAuth
+   * @name delete_dunning_rule
+   * @summary Delete Dunning Rule
+   * @request DELETE:/routes/dunning/rules/{rule_id}
+   */
+  delete_dunning_rule = ({ ruleId, ...query }: DeleteDunningRuleParams, params: RequestParams = {}) =>
+    this.request<DeleteDunningRuleData, DeleteDunningRuleError>({
+      path: `/routes/dunning/rules/${ruleId}`,
+      method: "DELETE",
+      ...params,
+    });
+
+  /**
+   * @description Public endpoint to initiate a trial.
+   *
+   * @tags dbtn/module:public_trial, dbtn/hasAuth
+   * @name start_trial_new
+   * @summary Start Trial New
+   * @request POST:/routes/public/start-trial-new
+   */
+  start_trial_new = (data: StartTrialRequest, params: RequestParams = {}) =>
+    this.request<StartTrialNewData, StartTrialNewError>({
+      path: `/routes/public/start-trial-new`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
       ...params,
     });
 }

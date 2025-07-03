@@ -91,7 +91,6 @@ import {
   GetRevenueOverTimeData,
   GetSettlementSummaryData,
   GetStripeConfigData,
-  GetSubscriptionPlansData,
   GetSubscriptionStripeConfigData,
   GetTeamInvitationsData,
   GetTeamMembersData,
@@ -123,7 +122,7 @@ import {
   SendInvoiceRequest,
   SendTrialRemindersCronData,
   SendTrialRemindersData,
-  StartTrialData,
+  StartTrialNewData,
   StartTrialRequest,
   StripeWebhookHandlerData,
   SubmitEnterpriseContactData,
@@ -221,120 +220,6 @@ export namespace Brain {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = GetStripeConfigData;
-  }
-
-  /**
-   * @description Create a new customer.
-   * @tags dbtn/module:customers, dbtn/hasAuth
-   * @name create_customer_endpoint
-   * @summary Create Customer Endpoint
-   * @request POST:/routes/customers/
-   */
-  export namespace create_customer_endpoint {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = CreateCustomerRequest;
-    export type RequestHeaders = {};
-    export type ResponseBody = CreateCustomerEndpointData;
-  }
-
-  /**
-   * @description Get list of customers with pagination and optional search.
-   * @tags dbtn/module:customers, dbtn/hasAuth
-   * @name get_customers_endpoint
-   * @summary Get Customers Endpoint
-   * @request GET:/routes/customers/
-   */
-  export namespace get_customers_endpoint {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /**
-       * Page
-       * Page number
-       * @min 1
-       * @default 1
-       */
-      page?: number;
-      /**
-       * Limit
-       * Items per page
-       * @min 1
-       * @max 100
-       * @default 20
-       */
-      limit?: number;
-      /**
-       * Search
-       * Search term for name or email
-       */
-      search?: string | null;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = GetCustomersEndpointData;
-  }
-
-  /**
-   * @description Get a specific customer by ID.
-   * @tags dbtn/module:customers, dbtn/hasAuth
-   * @name get_customer_endpoint
-   * @summary Get Customer Endpoint
-   * @request GET:/routes/customers/{customer_id}
-   */
-  export namespace get_customer_endpoint {
-    export type RequestParams = {
-      /**
-       * Customer Id
-       * @format uuid
-       */
-      customerId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = GetCustomerEndpointData;
-  }
-
-  /**
-   * @description Update an existing customer.
-   * @tags dbtn/module:customers, dbtn/hasAuth
-   * @name update_customer_endpoint
-   * @summary Update Customer Endpoint
-   * @request PUT:/routes/customers/{customer_id}
-   */
-  export namespace update_customer_endpoint {
-    export type RequestParams = {
-      /**
-       * Customer Id
-       * @format uuid
-       */
-      customerId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = UpdateCustomerRequest;
-    export type RequestHeaders = {};
-    export type ResponseBody = UpdateCustomerEndpointData;
-  }
-
-  /**
-   * @description Delete a customer.
-   * @tags dbtn/module:customers, dbtn/hasAuth
-   * @name delete_customer_endpoint
-   * @summary Delete Customer Endpoint
-   * @request DELETE:/routes/customers/{customer_id}
-   */
-  export namespace delete_customer_endpoint {
-    export type RequestParams = {
-      /**
-       * Customer Id
-       * @format uuid
-       */
-      customerId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = DeleteCustomerEndpointData;
   }
 
   /**
@@ -1521,6 +1406,464 @@ export namespace Brain {
   }
 
   /**
+   * @description Run the dunning job to send automated reminders.
+   * @tags dbtn/module:cron_jobs, dbtn/hasAuth
+   * @name run_dunning_job_cron
+   * @summary Run Dunning Job Cron
+   * @request POST:/routes/cron/run-dunning-job
+   */
+  export namespace run_dunning_job_cron {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {
+      /** Authorization */
+      authorization?: boolean;
+    };
+    export type ResponseBody = RunDunningJobCronData;
+  }
+
+  /**
+   * @description Run job to process trial conversions and send notifications.
+   * @tags dbtn/module:cron_jobs, dbtn/hasAuth
+   * @name run_trial_conversion_job_cron
+   * @summary Run Trial Conversion Job Cron
+   * @request POST:/routes/cron/run-trial-conversion-job
+   */
+  export namespace run_trial_conversion_job_cron {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {
+      /** Authorization */
+      authorization?: boolean;
+    };
+    export type ResponseBody = RunTrialConversionJobCronData;
+  }
+
+  /**
+   * @description Health check for cron job system.
+   * @tags dbtn/module:cron_jobs, dbtn/hasAuth
+   * @name cron_jobs_health_check
+   * @summary Cron Jobs Health Check
+   * @request GET:/routes/cron/health
+   */
+  export namespace cron_jobs_health_check {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = CronJobsHealthCheckData;
+  }
+
+  /**
+   * @description Send trial reminder emails to users approaching trial end.
+   * @tags dbtn/module:cron_jobs, dbtn/hasAuth
+   * @name send_trial_reminders_cron
+   * @summary Send Trial Reminders Cron
+   * @request POST:/routes/cron/send-trial-reminders
+   */
+  export namespace send_trial_reminders_cron {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {
+      /** Authorization */
+      authorization?: boolean;
+    };
+    export type ResponseBody = SendTrialRemindersCronData;
+  }
+
+  /**
+   * @description Get all available subscription plans directly from the PLANS constant.
+   * @tags dbtn/module:public_subscriptions, dbtn/hasAuth
+   * @name get_public_subscription_plans
+   * @summary Get Public Subscription Plans
+   * @request GET:/routes/public/plans
+   */
+  export namespace get_public_subscription_plans {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = GetPublicSubscriptionPlansData;
+  }
+
+  /**
+   * @description Returns the full details of the currently authenticated user object. This is crucial for debugging user ID and account linkage issues.
+   * @tags Debug, dbtn/module:debug, dbtn/hasAuth
+   * @name whoami
+   * @summary Whoami
+   * @request GET:/routes/debug/whoami
+   */
+  export namespace whoami {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = WhoamiData;
+  }
+
+  /**
+   * No description
+   * @tags dbtn/module:payouts, dbtn/hasAuth
+   * @name get_payouts_settlement_summary
+   * @summary Get Payouts Settlement Summary
+   * @request GET:/routes/payouts/settlement-summary
+   */
+  export namespace get_payouts_settlement_summary {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = GetPayoutsSettlementSummaryData;
+  }
+
+  /**
+   * No description
+   * @tags dbtn/module:payouts, dbtn/hasAuth
+   * @name get_payouts_transfers
+   * @summary Get Payouts Transfers
+   * @request GET:/routes/payouts/transfers
+   */
+  export namespace get_payouts_transfers {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /**
+       * Limit
+       * @default 10
+       */
+      limit?: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = GetPayoutsTransfersData;
+  }
+
+  /**
+   * No description
+   * @tags dbtn/module:payouts, dbtn/hasAuth
+   * @name create_payouts_instant_payout
+   * @summary Create Payouts Instant Payout
+   * @request POST:/routes/payouts/instant-payout
+   */
+  export namespace create_payouts_instant_payout {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = InstantPayoutRequest;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatePayoutsInstantPayoutData;
+  }
+
+  /**
+   * No description
+   * @tags dbtn/module:payouts, dbtn/hasAuth
+   * @name get_payouts_history
+   * @summary Get Payouts History
+   * @request GET:/routes/payouts/payouts
+   */
+  export namespace get_payouts_history {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /**
+       * Limit
+       * @default 10
+       */
+      limit?: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = GetPayoutsHistoryData;
+  }
+
+  /**
+   * @description Get Stripe configuration for subscription management.
+   * @tags dbtn/module:subscriptions, dbtn/hasAuth
+   * @name get_subscription_stripe_config
+   * @summary Get Subscription Stripe Config
+   * @request GET:/routes/config
+   */
+  export namespace get_subscription_stripe_config {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = GetSubscriptionStripeConfigData;
+  }
+
+  /**
+   * @description Get current user's subscription.
+   * @tags dbtn/module:subscriptions, dbtn/hasAuth
+   * @name get_current_subscription
+   * @summary Get Current Subscription
+   * @request GET:/routes/current
+   */
+  export namespace get_current_subscription {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = GetCurrentSubscriptionData;
+  }
+
+  /**
+   * @description Create a Stripe checkout session for subscription upgrade.
+   * @tags dbtn/module:subscriptions, dbtn/hasAuth
+   * @name create_checkout_session
+   * @summary Create Checkout Session
+   * @request POST:/routes/create-checkout-session
+   */
+  export namespace create_checkout_session {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = CreateCheckoutSessionRequest;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreateCheckoutSessionData;
+  }
+
+  /**
+   * @description Upgrade user's subscription to a paid plan (for direct payment method upgrades).
+   * @tags dbtn/module:subscriptions, dbtn/hasAuth
+   * @name upgrade_subscription
+   * @summary Upgrade Subscription
+   * @request POST:/routes/upgrade
+   */
+  export namespace upgrade_subscription {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = UpgradeSubscriptionRequest;
+    export type RequestHeaders = {};
+    export type ResponseBody = UpgradeSubscriptionData;
+  }
+
+  /**
+   * @description Cancel user's subscription.
+   * @tags dbtn/module:subscriptions, dbtn/hasAuth
+   * @name cancel_subscription
+   * @summary Cancel Subscription
+   * @request POST:/routes/cancel
+   */
+  export namespace cancel_subscription {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = CancelSubscriptionRequest;
+    export type RequestHeaders = {};
+    export type ResponseBody = CancelSubscriptionData;
+  }
+
+  /**
+   * @description Get billing history from Stripe for the current user.
+   * @tags dbtn/module:subscriptions, dbtn/hasAuth
+   * @name get_billing_history
+   * @summary Get Billing History
+   * @request GET:/routes/billing-history
+   */
+  export namespace get_billing_history {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /**
+       * Limit
+       * @default 10
+       */
+      limit?: number;
+      /** Starting After */
+      starting_after?: string | null;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = GetBillingHistoryData;
+  }
+
+  /**
+   * @description Create Stripe Customer Portal session for payment method and billing management.
+   * @tags dbtn/module:subscriptions, dbtn/hasAuth
+   * @name create_customer_portal
+   * @summary Create Customer Portal
+   * @request POST:/routes/customer-portal
+   */
+  export namespace create_customer_portal {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = CustomerPortalRequest;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreateCustomerPortalData;
+  }
+
+  /**
+   * @description Get user's feature access based on their subscription with auto-trial enrollment.
+   * @tags dbtn/module:subscriptions, dbtn/hasAuth
+   * @name get_feature_access
+   * @summary Get Feature Access
+   * @request GET:/routes/feature-access
+   */
+  export namespace get_feature_access {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = GetFeatureAccessData;
+  }
+
+  /**
+   * @description Handle Stripe webhook events for subscription updates.
+   * @tags dbtn/module:subscriptions, dbtn/hasAuth
+   * @name subscription_webhook_handler
+   * @summary Subscription Webhook Handler
+   * @request POST:/routes/stripe-webhook
+   */
+  export namespace subscription_webhook_handler {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = SubscriptionWebhookHandlerData;
+  }
+
+  /**
+   * @description Convert expired trials to Premium subscriptions.
+   * @tags dbtn/module:subscriptions, dbtn/hasAuth
+   * @name convert_expired_trials
+   * @summary Convert Expired Trials
+   * @request POST:/routes/convert-expired-trials
+   */
+  export namespace convert_expired_trials {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = ConvertExpiredTrialsData;
+  }
+
+  /**
+   * No description
+   * @tags dbtn/module:health, dbtn/hasAuth
+   * @name health_check
+   * @summary Health Check
+   * @request GET:/routes/health-check
+   */
+  export namespace health_check {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = HealthCheckData;
+  }
+
+  /**
+   * @description Create a new customer.
+   * @tags dbtn/module:customers, dbtn/hasAuth
+   * @name create_customer_endpoint
+   * @summary Create Customer Endpoint
+   * @request POST:/routes/customers/
+   */
+  export namespace create_customer_endpoint {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = CreateCustomerRequest;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreateCustomerEndpointData;
+  }
+
+  /**
+   * @description Get list of customers with pagination and optional search.
+   * @tags dbtn/module:customers, dbtn/hasAuth
+   * @name get_customers_endpoint
+   * @summary Get Customers Endpoint
+   * @request GET:/routes/customers/
+   */
+  export namespace get_customers_endpoint {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /**
+       * Page
+       * Page number
+       * @min 1
+       * @default 1
+       */
+      page?: number;
+      /**
+       * Limit
+       * Items per page
+       * @min 1
+       * @max 100
+       * @default 20
+       */
+      limit?: number;
+      /**
+       * Search
+       * Search term for name or email
+       */
+      search?: string | null;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = GetCustomersEndpointData;
+  }
+
+  /**
+   * @description Get a specific customer by ID.
+   * @tags dbtn/module:customers, dbtn/hasAuth
+   * @name get_customer_endpoint
+   * @summary Get Customer Endpoint
+   * @request GET:/routes/customers/{customer_id}
+   */
+  export namespace get_customer_endpoint {
+    export type RequestParams = {
+      /**
+       * Customer Id
+       * @format uuid
+       */
+      customerId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = GetCustomerEndpointData;
+  }
+
+  /**
+   * @description Update an existing customer.
+   * @tags dbtn/module:customers, dbtn/hasAuth
+   * @name update_customer_endpoint
+   * @summary Update Customer Endpoint
+   * @request PUT:/routes/customers/{customer_id}
+   */
+  export namespace update_customer_endpoint {
+    export type RequestParams = {
+      /**
+       * Customer Id
+       * @format uuid
+       */
+      customerId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = UpdateCustomerRequest;
+    export type RequestHeaders = {};
+    export type ResponseBody = UpdateCustomerEndpointData;
+  }
+
+  /**
+   * @description Delete a customer.
+   * @tags dbtn/module:customers, dbtn/hasAuth
+   * @name delete_customer_endpoint
+   * @summary Delete Customer Endpoint
+   * @request DELETE:/routes/customers/{customer_id}
+   */
+  export namespace delete_customer_endpoint {
+    export type RequestParams = {
+      /**
+       * Customer Id
+       * @format uuid
+       */
+      customerId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = DeleteCustomerEndpointData;
+  }
+
+  /**
    * @description Creates a new invoice.
    * @tags dbtn/module:invoices, dbtn/hasAuth
    * @name create_invoice_endpoint
@@ -1689,261 +2032,6 @@ export namespace Brain {
   }
 
   /**
-   * @description Run the dunning job to send automated reminders.
-   * @tags dbtn/module:cron_jobs, dbtn/hasAuth
-   * @name run_dunning_job_cron
-   * @summary Run Dunning Job Cron
-   * @request POST:/routes/cron/run-dunning-job
-   */
-  export namespace run_dunning_job_cron {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      /** Authorization */
-      authorization?: boolean;
-    };
-    export type ResponseBody = RunDunningJobCronData;
-  }
-
-  /**
-   * @description Run job to process trial conversions and send notifications.
-   * @tags dbtn/module:cron_jobs, dbtn/hasAuth
-   * @name run_trial_conversion_job_cron
-   * @summary Run Trial Conversion Job Cron
-   * @request POST:/routes/cron/run-trial-conversion-job
-   */
-  export namespace run_trial_conversion_job_cron {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      /** Authorization */
-      authorization?: boolean;
-    };
-    export type ResponseBody = RunTrialConversionJobCronData;
-  }
-
-  /**
-   * @description Health check for cron job system.
-   * @tags dbtn/module:cron_jobs, dbtn/hasAuth
-   * @name cron_jobs_health_check
-   * @summary Cron Jobs Health Check
-   * @request GET:/routes/cron/health
-   */
-  export namespace cron_jobs_health_check {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = CronJobsHealthCheckData;
-  }
-
-  /**
-   * @description Send trial reminder emails to users approaching trial end.
-   * @tags dbtn/module:cron_jobs, dbtn/hasAuth
-   * @name send_trial_reminders_cron
-   * @summary Send Trial Reminders Cron
-   * @request POST:/routes/cron/send-trial-reminders
-   */
-  export namespace send_trial_reminders_cron {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      /** Authorization */
-      authorization?: boolean;
-    };
-    export type ResponseBody = SendTrialRemindersCronData;
-  }
-
-  /**
-   * @description Get all available subscription plans with full feature details. This endpoint is public and does not require authentication.
-   * @tags Public Data, dbtn/module:public_data, dbtn/hasAuth
-   * @name get_public_subscription_plans
-   * @summary Get Public Subscription Plans
-   * @request GET:/routes/public/plans
-   */
-  export namespace get_public_subscription_plans {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = GetPublicSubscriptionPlansData;
-  }
-
-  /**
-   * @description Returns the full details of the currently authenticated user object. This is crucial for debugging user ID and account linkage issues.
-   * @tags Debug, dbtn/module:debug, dbtn/hasAuth
-   * @name whoami
-   * @summary Whoami
-   * @request GET:/routes/debug/whoami
-   */
-  export namespace whoami {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = WhoamiData;
-  }
-
-  /**
-   * No description
-   * @tags dbtn/module:payouts, dbtn/hasAuth
-   * @name get_payouts_settlement_summary
-   * @summary Get Payouts Settlement Summary
-   * @request GET:/routes/payouts/settlement-summary
-   */
-  export namespace get_payouts_settlement_summary {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = GetPayoutsSettlementSummaryData;
-  }
-
-  /**
-   * No description
-   * @tags dbtn/module:payouts, dbtn/hasAuth
-   * @name get_payouts_transfers
-   * @summary Get Payouts Transfers
-   * @request GET:/routes/payouts/transfers
-   */
-  export namespace get_payouts_transfers {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /**
-       * Limit
-       * @default 10
-       */
-      limit?: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = GetPayoutsTransfersData;
-  }
-
-  /**
-   * No description
-   * @tags dbtn/module:payouts, dbtn/hasAuth
-   * @name create_payouts_instant_payout
-   * @summary Create Payouts Instant Payout
-   * @request POST:/routes/payouts/instant-payout
-   */
-  export namespace create_payouts_instant_payout {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = InstantPayoutRequest;
-    export type RequestHeaders = {};
-    export type ResponseBody = CreatePayoutsInstantPayoutData;
-  }
-
-  /**
-   * No description
-   * @tags dbtn/module:payouts, dbtn/hasAuth
-   * @name get_payouts_history
-   * @summary Get Payouts History
-   * @request GET:/routes/payouts/payouts
-   */
-  export namespace get_payouts_history {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /**
-       * Limit
-       * @default 10
-       */
-      limit?: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = GetPayoutsHistoryData;
-  }
-
-  /**
-   * No description
-   * @tags Dunning, dbtn/module:dunning, dbtn/hasAuth
-   * @name get_dunning_rules
-   * @summary Get Dunning Rules
-   * @request GET:/routes/dunning/rules
-   */
-  export namespace get_dunning_rules {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = GetDunningRulesData;
-  }
-
-  /**
-   * No description
-   * @tags Dunning, dbtn/module:dunning, dbtn/hasAuth
-   * @name create_dunning_rule
-   * @summary Create Dunning Rule
-   * @request POST:/routes/dunning/rules
-   */
-  export namespace create_dunning_rule {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = DunningRule;
-    export type RequestHeaders = {};
-    export type ResponseBody = CreateDunningRuleData;
-  }
-
-  /**
-   * No description
-   * @tags Dunning, dbtn/module:dunning, dbtn/hasAuth
-   * @name get_dunning_rule
-   * @summary Get Dunning Rule
-   * @request GET:/routes/dunning/rules/{rule_id}
-   */
-  export namespace get_dunning_rule {
-    export type RequestParams = {
-      /** Rule Id */
-      ruleId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = GetDunningRuleData;
-  }
-
-  /**
-   * No description
-   * @tags Dunning, dbtn/module:dunning, dbtn/hasAuth
-   * @name update_dunning_rule
-   * @summary Update Dunning Rule
-   * @request PUT:/routes/dunning/rules/{rule_id}
-   */
-  export namespace update_dunning_rule {
-    export type RequestParams = {
-      /** Rule Id */
-      ruleId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = DunningRule;
-    export type RequestHeaders = {};
-    export type ResponseBody = UpdateDunningRuleData;
-  }
-
-  /**
-   * No description
-   * @tags Dunning, dbtn/module:dunning, dbtn/hasAuth
-   * @name delete_dunning_rule
-   * @summary Delete Dunning Rule
-   * @request DELETE:/routes/dunning/rules/{rule_id}
-   */
-  export namespace delete_dunning_rule {
-    export type RequestParams = {
-      /** Rule Id */
-      ruleId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = DeleteDunningRuleData;
-  }
-
-  /**
    * @description Returns the core financial stats for the main dashboard view. Combines total revenue/outstanding with invoice status counts.
    * @tags dbtn/module:dashboard, dbtn/hasAuth
    * @name get_financial_stats
@@ -2074,205 +2162,101 @@ export namespace Brain {
   }
 
   /**
-   * @description Get Stripe configuration for subscription management.
-   * @tags dbtn/module:subscriptions, dbtn/hasAuth
-   * @name get_subscription_stripe_config
-   * @summary Get Subscription Stripe Config
-   * @request GET:/routes/config
+   * No description
+   * @tags Dunning, dbtn/module:dunning, dbtn/hasAuth
+   * @name get_dunning_rules
+   * @summary Get Dunning Rules
+   * @request GET:/routes/dunning/rules
    */
-  export namespace get_subscription_stripe_config {
+  export namespace get_dunning_rules {
     export type RequestParams = {};
     export type RequestQuery = {};
     export type RequestBody = never;
     export type RequestHeaders = {};
-    export type ResponseBody = GetSubscriptionStripeConfigData;
-  }
-
-  /**
-   * @description Get all available subscription plans directly from the PLANS constant.
-   * @tags dbtn/module:subscriptions, dbtn/hasAuth
-   * @name get_subscription_plans
-   * @summary Get Subscription Plans
-   * @request GET:/routes/plans
-   */
-  export namespace get_subscription_plans {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = GetSubscriptionPlansData;
-  }
-
-  /**
-   * @description Get current user's subscription.
-   * @tags dbtn/module:subscriptions, dbtn/hasAuth
-   * @name get_current_subscription
-   * @summary Get Current Subscription
-   * @request GET:/routes/current
-   */
-  export namespace get_current_subscription {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = GetCurrentSubscriptionData;
-  }
-
-  /**
-   * @description Start a free trial for a new user (now works for all users).
-   * @tags dbtn/module:subscriptions, dbtn/hasAuth
-   * @name start_trial
-   * @summary Start Trial
-   * @request POST:/routes/start-trial
-   */
-  export namespace start_trial {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = StartTrialRequest;
-    export type RequestHeaders = {};
-    export type ResponseBody = StartTrialData;
-  }
-
-  /**
-   * @description Create a Stripe checkout session for subscription upgrade.
-   * @tags dbtn/module:subscriptions, dbtn/hasAuth
-   * @name create_checkout_session
-   * @summary Create Checkout Session
-   * @request POST:/routes/create-checkout-session
-   */
-  export namespace create_checkout_session {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = CreateCheckoutSessionRequest;
-    export type RequestHeaders = {};
-    export type ResponseBody = CreateCheckoutSessionData;
-  }
-
-  /**
-   * @description Upgrade user's subscription to a paid plan (for direct payment method upgrades).
-   * @tags dbtn/module:subscriptions, dbtn/hasAuth
-   * @name upgrade_subscription
-   * @summary Upgrade Subscription
-   * @request POST:/routes/upgrade
-   */
-  export namespace upgrade_subscription {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = UpgradeSubscriptionRequest;
-    export type RequestHeaders = {};
-    export type ResponseBody = UpgradeSubscriptionData;
-  }
-
-  /**
-   * @description Cancel user's subscription.
-   * @tags dbtn/module:subscriptions, dbtn/hasAuth
-   * @name cancel_subscription
-   * @summary Cancel Subscription
-   * @request POST:/routes/cancel
-   */
-  export namespace cancel_subscription {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = CancelSubscriptionRequest;
-    export type RequestHeaders = {};
-    export type ResponseBody = CancelSubscriptionData;
-  }
-
-  /**
-   * @description Get billing history from Stripe for the current user.
-   * @tags dbtn/module:subscriptions, dbtn/hasAuth
-   * @name get_billing_history
-   * @summary Get Billing History
-   * @request GET:/routes/billing-history
-   */
-  export namespace get_billing_history {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /**
-       * Limit
-       * @default 10
-       */
-      limit?: number;
-      /** Starting After */
-      starting_after?: string | null;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = GetBillingHistoryData;
-  }
-
-  /**
-   * @description Create Stripe Customer Portal session for payment method and billing management.
-   * @tags dbtn/module:subscriptions, dbtn/hasAuth
-   * @name create_customer_portal
-   * @summary Create Customer Portal
-   * @request POST:/routes/customer-portal
-   */
-  export namespace create_customer_portal {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = CustomerPortalRequest;
-    export type RequestHeaders = {};
-    export type ResponseBody = CreateCustomerPortalData;
-  }
-
-  /**
-   * @description Get user's feature access based on their subscription with auto-trial enrollment.
-   * @tags dbtn/module:subscriptions, dbtn/hasAuth
-   * @name get_feature_access
-   * @summary Get Feature Access
-   * @request GET:/routes/feature-access
-   */
-  export namespace get_feature_access {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = GetFeatureAccessData;
-  }
-
-  /**
-   * @description Handle Stripe webhook events for subscription updates.
-   * @tags dbtn/module:subscriptions, dbtn/hasAuth
-   * @name subscription_webhook_handler
-   * @summary Subscription Webhook Handler
-   * @request POST:/routes/stripe-webhook
-   */
-  export namespace subscription_webhook_handler {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = SubscriptionWebhookHandlerData;
-  }
-
-  /**
-   * @description Convert expired trials to Premium subscriptions.
-   * @tags dbtn/module:subscriptions, dbtn/hasAuth
-   * @name convert_expired_trials
-   * @summary Convert Expired Trials
-   * @request POST:/routes/convert-expired-trials
-   */
-  export namespace convert_expired_trials {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = ConvertExpiredTrialsData;
+    export type ResponseBody = GetDunningRulesData;
   }
 
   /**
    * No description
-   * @tags dbtn/module:health, dbtn/hasAuth
-   * @name health_check
-   * @summary Health Check
-   * @request GET:/routes/health-check
+   * @tags Dunning, dbtn/module:dunning, dbtn/hasAuth
+   * @name create_dunning_rule
+   * @summary Create Dunning Rule
+   * @request POST:/routes/dunning/rules
    */
-  export namespace health_check {
+  export namespace create_dunning_rule {
     export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = DunningRule;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreateDunningRuleData;
+  }
+
+  /**
+   * No description
+   * @tags Dunning, dbtn/module:dunning, dbtn/hasAuth
+   * @name get_dunning_rule
+   * @summary Get Dunning Rule
+   * @request GET:/routes/dunning/rules/{rule_id}
+   */
+  export namespace get_dunning_rule {
+    export type RequestParams = {
+      /** Rule Id */
+      ruleId: string;
+    };
     export type RequestQuery = {};
     export type RequestBody = never;
     export type RequestHeaders = {};
-    export type ResponseBody = HealthCheckData;
+    export type ResponseBody = GetDunningRuleData;
+  }
+
+  /**
+   * No description
+   * @tags Dunning, dbtn/module:dunning, dbtn/hasAuth
+   * @name update_dunning_rule
+   * @summary Update Dunning Rule
+   * @request PUT:/routes/dunning/rules/{rule_id}
+   */
+  export namespace update_dunning_rule {
+    export type RequestParams = {
+      /** Rule Id */
+      ruleId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = DunningRule;
+    export type RequestHeaders = {};
+    export type ResponseBody = UpdateDunningRuleData;
+  }
+
+  /**
+   * No description
+   * @tags Dunning, dbtn/module:dunning, dbtn/hasAuth
+   * @name delete_dunning_rule
+   * @summary Delete Dunning Rule
+   * @request DELETE:/routes/dunning/rules/{rule_id}
+   */
+  export namespace delete_dunning_rule {
+    export type RequestParams = {
+      /** Rule Id */
+      ruleId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = DeleteDunningRuleData;
+  }
+
+  /**
+   * @description Public endpoint to initiate a trial.
+   * @tags dbtn/module:public_trial, dbtn/hasAuth
+   * @name start_trial_new
+   * @summary Start Trial New
+   * @request POST:/routes/public/start-trial-new
+   */
+  export namespace start_trial_new {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = StartTrialRequest;
+    export type RequestHeaders = {};
+    export type ResponseBody = StartTrialNewData;
   }
 }
