@@ -4,6 +4,27 @@ export interface AcceptInvitationRequest {
   token: string;
 }
 
+/** Activity */
+export interface Activity {
+  /** Id */
+  id: string;
+  /** Type */
+  type: string;
+  /** Description */
+  description: string;
+  /**
+   * Timestamp
+   * @format date-time
+   */
+  timestamp: string;
+}
+
+/** ActivityFeedResponse */
+export interface ActivityFeedResponse {
+  /** Data */
+  data: Activity[];
+}
+
 /** AdminStatsResponse */
 export interface AdminStatsResponse {
   /** Trial Stats */
@@ -605,6 +626,15 @@ export interface FeeStructureInfo {
   example_fee_on_100: string;
 }
 
+/** FinancialStatsResponse */
+export interface FinancialStatsResponse {
+  /** Total Revenue */
+  total_revenue: number;
+  /** Total Outstanding */
+  total_outstanding: number;
+  invoice_summary: InvoiceSummary;
+}
+
 /** HTTPValidationError */
 export interface HTTPValidationError {
   /** Detail */
@@ -615,6 +645,18 @@ export interface HTTPValidationError {
 export interface HealthResponse {
   /** Status */
   status: string;
+}
+
+/** HealthStatus */
+export interface HealthStatus {
+  /** Database */
+  database: string;
+  /** Stripe */
+  stripe: string;
+  /** Dunning Job */
+  dunning_job: string;
+  /** Trial Conversion Job */
+  trial_conversion_job: string;
 }
 
 /** InstantPayoutRequest */
@@ -749,6 +791,18 @@ export interface InvoiceResponse {
 export interface InvoiceStatusBreakdownResponse {
   /** Data */
   data: Record<string, number>;
+}
+
+/** InvoiceSummary */
+export interface InvoiceSummary {
+  /** Paid */
+  paid: number;
+  /** Sent */
+  sent: number;
+  /** Overdue */
+  overdue: number;
+  /** Draft */
+  draft: number;
 }
 
 /** InvoicesListResponse */
@@ -1105,22 +1159,24 @@ export interface PublicSubscriptionPlanResponse {
   id: string;
   /** Name */
   name: string;
-  /** Slug */
-  slug: string;
   /** Description */
   description?: string | null;
   /** Price Monthly */
   price_monthly: number;
-  /** Price Yearly */
-  price_yearly?: number | null;
-  /** Features */
-  features: Record<string, any>;
   /** Invoice Limit */
   invoice_limit: number;
   /** Team Member Limit */
   team_member_limit: number;
   /** Dunning Rules Limit */
   dunning_rules_limit: number;
+  /** Features */
+  features: Record<string, any>;
+  /** Stripe Price Id Monthly */
+  stripe_price_id_monthly: string;
+  /** Stripe Price Id Yearly */
+  stripe_price_id_yearly: string;
+  /** Slug */
+  slug: string;
 }
 
 /** Representative */
@@ -1178,6 +1234,18 @@ export interface SendInvoiceRequest {
    * Custom message to include in email
    */
   email_message?: string | null;
+}
+
+/** SettlementSummaryResponse */
+export interface SettlementSummaryResponse {
+  /** Gross Receipts */
+  gross_receipts: number;
+  /** Stripe Fees */
+  stripe_fees: number;
+  /** Platform Fees */
+  platform_fees: number;
+  /** Net Payout */
+  net_payout: number;
 }
 
 /** StartTrialRequest */
@@ -1300,6 +1368,20 @@ export interface TeamMemberResponse {
    * @format date-time
    */
   created_at: string;
+}
+
+/** TopCustomer */
+export interface TopCustomer {
+  /** Name */
+  name: string;
+  /** Total Revenue */
+  total_revenue: number;
+}
+
+/** TopCustomersResponse */
+export interface TopCustomersResponse {
+  /** Data */
+  data: TopCustomer[];
 }
 
 /** TransactionFeeDetail */
@@ -2096,7 +2178,16 @@ export type AcceptInvitationPublic2Error = HTTPValidationError;
 
 export type GetMyRoleData = any;
 
-export type GetSettlementSummaryData = AppApisSettlementsSettlementSummary;
+export interface GetSettlementSummaryParams {
+  /** Start Date */
+  start_date?: string | null;
+  /** End Date */
+  end_date?: string | null;
+}
+
+export type GetSettlementSummaryData = SettlementSummaryResponse;
+
+export type GetSettlementSummaryError = HTTPValidationError;
 
 export interface GetTransfersParams {
   /**
@@ -2127,39 +2218,6 @@ export interface GetPayoutsParams {
 export type GetPayoutsData = PayoutResponse[];
 
 export type GetPayoutsError = HTTPValidationError;
-
-export interface GetKpiSummaryParams {
-  /** Start Date */
-  start_date?: string | null;
-  /** End Date */
-  end_date?: string | null;
-}
-
-export type GetKpiSummaryData = KpiSummaryResponse;
-
-export type GetKpiSummaryError = HTTPValidationError;
-
-export interface GetRevenueOverTimeParams {
-  /** Start Date */
-  start_date?: string | null;
-  /** End Date */
-  end_date?: string | null;
-}
-
-export type GetRevenueOverTimeData = RevenueOverTimeResponse;
-
-export type GetRevenueOverTimeError = HTTPValidationError;
-
-export interface GetInvoiceStatusBreakdownParams {
-  /** Start Date */
-  start_date?: string | null;
-  /** End Date */
-  end_date?: string | null;
-}
-
-export type GetInvoiceStatusBreakdownData = InvoiceStatusBreakdownResponse;
-
-export type GetInvoiceStatusBreakdownError = HTTPValidationError;
 
 export type GetTrialStatisticsData = AdminStatsResponse;
 
@@ -2537,6 +2595,54 @@ export type GetSubscriptionFeatureAccessData = FeatureAccessResponse;
 
 export type GetSubscriptionFeatureAccessError = HTTPValidationError;
 
+export type GetFinancialStatsData = FinancialStatsResponse;
+
+export interface GetKpiSummaryParams {
+  /** Start Date */
+  start_date?: string | null;
+  /** End Date */
+  end_date?: string | null;
+}
+
+export type GetKpiSummaryData = KpiSummaryResponse;
+
+export type GetKpiSummaryError = HTTPValidationError;
+
+export interface GetRevenueOverTimeParams {
+  /** Start Date */
+  start_date?: string | null;
+  /** End Date */
+  end_date?: string | null;
+}
+
+export type GetRevenueOverTimeData = RevenueOverTimeResponse;
+
+export type GetRevenueOverTimeError = HTTPValidationError;
+
+export interface GetInvoiceStatusBreakdownParams {
+  /** Start Date */
+  start_date?: string | null;
+  /** End Date */
+  end_date?: string | null;
+}
+
+export type GetInvoiceStatusBreakdownData = InvoiceStatusBreakdownResponse;
+
+export type GetInvoiceStatusBreakdownError = HTTPValidationError;
+
+export interface GetTopCustomersParams {
+  /** Start Date */
+  start_date?: string | null;
+  /** End Date */
+  end_date?: string | null;
+}
+
+export type GetTopCustomersData = TopCustomersResponse;
+
+export type GetTopCustomersError = HTTPValidationError;
+
+export type GetActivityFeedData = ActivityFeedResponse;
+
 export type GetSubscriptionStripeConfigData = AppApisSubscriptionsStripeConfigResponse;
 
 /** Response Get Subscription Plans */
@@ -2585,3 +2691,5 @@ export type GetFeatureAccessData = Record<string, any>;
 export type SubscriptionWebhookHandlerData = any;
 
 export type ConvertExpiredTrialsData = any;
+
+export type HealthCheckData = HealthStatus;

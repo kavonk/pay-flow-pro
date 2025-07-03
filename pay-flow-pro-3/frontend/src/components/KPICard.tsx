@@ -1,3 +1,4 @@
+import { Skeleton } from "@/components/ui/skeleton";
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/utils/cn";
@@ -40,5 +41,20 @@ const KPICard: React.FC<Props> = ({
     </Card>
   );
 };
+
+export const KPICardSkeleton = () => (
+    <Card className="bg-gray-900/50 border-gray-800 text-white shadow-lg backdrop-blur-sm">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Skeleton className="h-4 w-2/4" />
+        <div className="text-gray-400">
+            <Skeleton className="h-6 w-6" />
+        </div>
+      </CardHeader>
+      <CardContent>
+        <Skeleton className="h-8 w-3/4 mb-2" />
+        <Skeleton className="h-3 w-1/2" />
+      </CardContent>
+    </Card>
+);
 
 export default KPICard;

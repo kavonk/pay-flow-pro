@@ -46,6 +46,7 @@ import {
   ExportInvoicesData,
   ExportPaymentsData,
   FeePreviewRequest,
+  GetActivityFeedData,
   GetAllPlanFeeInfoData,
   GetAuditLogsData,
   GetAuditStatsData,
@@ -68,6 +69,7 @@ import {
   GetFeatureAccessData,
   GetFeePreviewData,
   GetFeeStructureData,
+  GetFinancialStatsData,
   GetInvitationDetails2Data,
   GetInvitationDetailsData,
   GetInvoiceEndpointData,
@@ -94,9 +96,11 @@ import {
   GetSubscriptionStripeConfigData,
   GetTeamInvitationsData,
   GetTeamMembersData,
+  GetTopCustomersData,
   GetTransfersData,
   GetTrialStatisticsData,
   GetUnbilledFeesData,
+  HealthCheckData,
   InstantPayoutRequest,
   InviteUserData,
   InviteUserRequest,
@@ -812,15 +816,20 @@ export namespace Brain {
   }
 
   /**
-   * @description Get settlement summary with fee breakdown.
-   * @tags dbtn/module:settlements, dbtn/hasAuth
+   * @description Returns settlement summary data.
+   * @tags dbtn/module:dashboard, dbtn/hasAuth
    * @name get_settlement_summary
    * @summary Get Settlement Summary
    * @request GET:/routes/settlement-summary
    */
   export namespace get_settlement_summary {
     export type RequestParams = {};
-    export type RequestQuery = {};
+    export type RequestQuery = {
+      /** Start Date */
+      start_date?: string | null;
+      /** End Date */
+      end_date?: string | null;
+    };
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = GetSettlementSummaryData;
@@ -881,66 +890,6 @@ export namespace Brain {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = GetPayoutsData;
-  }
-
-  /**
-   * @description Calculates and returns key performance indicators for the dashboard.
-   * @tags dbtn/module:dashboard, dbtn/hasAuth
-   * @name get_kpi_summary
-   * @summary Get Kpi Summary
-   * @request GET:/routes/kpi-summary
-   */
-  export namespace get_kpi_summary {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Start Date */
-      start_date?: string | null;
-      /** End Date */
-      end_date?: string | null;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = GetKpiSummaryData;
-  }
-
-  /**
-   * @description Returns revenue data over a specified time period.
-   * @tags dbtn/module:dashboard, dbtn/hasAuth
-   * @name get_revenue_over_time
-   * @summary Get Revenue Over Time
-   * @request GET:/routes/revenue-over-time
-   */
-  export namespace get_revenue_over_time {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Start Date */
-      start_date?: string | null;
-      /** End Date */
-      end_date?: string | null;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = GetRevenueOverTimeData;
-  }
-
-  /**
-   * @description Returns the breakdown of invoices by status.
-   * @tags dbtn/module:dashboard, dbtn/hasAuth
-   * @name get_invoice_status_breakdown
-   * @summary Get Invoice Status Breakdown
-   * @request GET:/routes/invoice-status-breakdown
-   */
-  export namespace get_invoice_status_breakdown {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Start Date */
-      start_date?: string | null;
-      /** End Date */
-      end_date?: string | null;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = GetInvoiceStatusBreakdownData;
   }
 
   /**
@@ -2037,6 +1986,116 @@ export namespace Brain {
   }
 
   /**
+   * @description Returns the core financial stats for the main dashboard view. Combines total revenue/outstanding with invoice status counts.
+   * @tags dbtn/module:dashboard, dbtn/hasAuth
+   * @name get_financial_stats
+   * @summary Get Core Financial Stats
+   * @request GET:/routes/financial-stats
+   */
+  export namespace get_financial_stats {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = GetFinancialStatsData;
+  }
+
+  /**
+   * @description Calculates and returns key performance indicators for the dashboard.
+   * @tags dbtn/module:dashboard, dbtn/hasAuth
+   * @name get_kpi_summary
+   * @summary Get Kpi Summary
+   * @request GET:/routes/kpi-summary
+   */
+  export namespace get_kpi_summary {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Start Date */
+      start_date?: string | null;
+      /** End Date */
+      end_date?: string | null;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = GetKpiSummaryData;
+  }
+
+  /**
+   * @description Returns revenue data over a specified time period.
+   * @tags dbtn/module:dashboard, dbtn/hasAuth
+   * @name get_revenue_over_time
+   * @summary Get Revenue Over Time
+   * @request GET:/routes/revenue-over-time
+   */
+  export namespace get_revenue_over_time {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Start Date */
+      start_date?: string | null;
+      /** End Date */
+      end_date?: string | null;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = GetRevenueOverTimeData;
+  }
+
+  /**
+   * @description Returns the breakdown of invoices by status.
+   * @tags dbtn/module:dashboard, dbtn/hasAuth
+   * @name get_invoice_status_breakdown
+   * @summary Get Invoice Status Breakdown
+   * @request GET:/routes/invoice-status-breakdown
+   */
+  export namespace get_invoice_status_breakdown {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Start Date */
+      start_date?: string | null;
+      /** End Date */
+      end_date?: string | null;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = GetInvoiceStatusBreakdownData;
+  }
+
+  /**
+   * @description Returns top 5 customers by revenue.
+   * @tags dbtn/module:dashboard, dbtn/hasAuth
+   * @name get_top_customers
+   * @summary Get Top Customers
+   * @request GET:/routes/top-customers
+   */
+  export namespace get_top_customers {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Start Date */
+      start_date?: string | null;
+      /** End Date */
+      end_date?: string | null;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = GetTopCustomersData;
+  }
+
+  /**
+   * @description Returns the recent activity feed.
+   * @tags dbtn/module:dashboard, dbtn/hasAuth
+   * @name get_activity_feed
+   * @summary Get Activity Feed
+   * @request GET:/routes/activity-feed
+   */
+  export namespace get_activity_feed {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = GetActivityFeedData;
+  }
+
+  /**
    * @description Get Stripe configuration for subscription management.
    * @tags dbtn/module:subscriptions, dbtn/hasAuth
    * @name get_subscription_stripe_config
@@ -2224,5 +2283,20 @@ export namespace Brain {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = ConvertExpiredTrialsData;
+  }
+
+  /**
+   * No description
+   * @tags dbtn/module:health, dbtn/hasAuth
+   * @name health_check
+   * @summary Health Check
+   * @request GET:/routes/health-check
+   */
+  export namespace health_check {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = HealthCheckData;
   }
 }

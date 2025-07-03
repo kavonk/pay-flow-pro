@@ -77,6 +77,7 @@ import {
   ExportPaymentsError,
   ExportPaymentsParams,
   FeePreviewRequest,
+  GetActivityFeedData,
   GetAllPlanFeeInfoData,
   GetAuditLogsData,
   GetAuditLogsError,
@@ -112,6 +113,7 @@ import {
   GetFeePreviewData,
   GetFeePreviewError,
   GetFeeStructureData,
+  GetFinancialStatsData,
   GetInvitationDetails2Data,
   GetInvitationDetails2Error,
   GetInvitationDetails2Params,
@@ -160,6 +162,8 @@ import {
   GetRevenueOverTimeError,
   GetRevenueOverTimeParams,
   GetSettlementSummaryData,
+  GetSettlementSummaryError,
+  GetSettlementSummaryParams,
   GetStripeConfigData,
   GetSubscriptionFeatureAccessData,
   GetSubscriptionFeatureAccessError,
@@ -168,11 +172,15 @@ import {
   GetSubscriptionStripeConfigData,
   GetTeamInvitationsData,
   GetTeamMembersData,
+  GetTopCustomersData,
+  GetTopCustomersError,
+  GetTopCustomersParams,
   GetTransfersData,
   GetTransfersError,
   GetTransfersParams,
   GetTrialStatisticsData,
   GetUnbilledFeesData,
+  HealthCheckData,
   InstantPayoutRequest,
   InviteUserData,
   InviteUserError,
@@ -712,17 +720,18 @@ export class Brain<SecurityDataType = unknown> extends HttpClient<SecurityDataTy
     });
 
   /**
-   * @description Get settlement summary with fee breakdown.
+   * @description Returns settlement summary data.
    *
-   * @tags dbtn/module:settlements, dbtn/hasAuth
+   * @tags dbtn/module:dashboard, dbtn/hasAuth
    * @name get_settlement_summary
    * @summary Get Settlement Summary
    * @request GET:/routes/settlement-summary
    */
-  get_settlement_summary = (params: RequestParams = {}) =>
-    this.request<GetSettlementSummaryData, any>({
+  get_settlement_summary = (query: GetSettlementSummaryParams, params: RequestParams = {}) =>
+    this.request<GetSettlementSummaryData, GetSettlementSummaryError>({
       path: `/routes/settlement-summary`,
       method: "GET",
+      query: query,
       ...params,
     });
 
@@ -770,54 +779,6 @@ export class Brain<SecurityDataType = unknown> extends HttpClient<SecurityDataTy
   get_payouts = (query: GetPayoutsParams, params: RequestParams = {}) =>
     this.request<GetPayoutsData, GetPayoutsError>({
       path: `/routes/payouts`,
-      method: "GET",
-      query: query,
-      ...params,
-    });
-
-  /**
-   * @description Calculates and returns key performance indicators for the dashboard.
-   *
-   * @tags dbtn/module:dashboard, dbtn/hasAuth
-   * @name get_kpi_summary
-   * @summary Get Kpi Summary
-   * @request GET:/routes/kpi-summary
-   */
-  get_kpi_summary = (query: GetKpiSummaryParams, params: RequestParams = {}) =>
-    this.request<GetKpiSummaryData, GetKpiSummaryError>({
-      path: `/routes/kpi-summary`,
-      method: "GET",
-      query: query,
-      ...params,
-    });
-
-  /**
-   * @description Returns revenue data over a specified time period.
-   *
-   * @tags dbtn/module:dashboard, dbtn/hasAuth
-   * @name get_revenue_over_time
-   * @summary Get Revenue Over Time
-   * @request GET:/routes/revenue-over-time
-   */
-  get_revenue_over_time = (query: GetRevenueOverTimeParams, params: RequestParams = {}) =>
-    this.request<GetRevenueOverTimeData, GetRevenueOverTimeError>({
-      path: `/routes/revenue-over-time`,
-      method: "GET",
-      query: query,
-      ...params,
-    });
-
-  /**
-   * @description Returns the breakdown of invoices by status.
-   *
-   * @tags dbtn/module:dashboard, dbtn/hasAuth
-   * @name get_invoice_status_breakdown
-   * @summary Get Invoice Status Breakdown
-   * @request GET:/routes/invoice-status-breakdown
-   */
-  get_invoice_status_breakdown = (query: GetInvoiceStatusBreakdownParams, params: RequestParams = {}) =>
-    this.request<GetInvoiceStatusBreakdownData, GetInvoiceStatusBreakdownError>({
-      path: `/routes/invoice-status-breakdown`,
       method: "GET",
       query: query,
       ...params,
@@ -1824,6 +1785,100 @@ export class Brain<SecurityDataType = unknown> extends HttpClient<SecurityDataTy
     });
 
   /**
+   * @description Returns the core financial stats for the main dashboard view. Combines total revenue/outstanding with invoice status counts.
+   *
+   * @tags dbtn/module:dashboard, dbtn/hasAuth
+   * @name get_financial_stats
+   * @summary Get Core Financial Stats
+   * @request GET:/routes/financial-stats
+   */
+  get_financial_stats = (params: RequestParams = {}) =>
+    this.request<GetFinancialStatsData, any>({
+      path: `/routes/financial-stats`,
+      method: "GET",
+      ...params,
+    });
+
+  /**
+   * @description Calculates and returns key performance indicators for the dashboard.
+   *
+   * @tags dbtn/module:dashboard, dbtn/hasAuth
+   * @name get_kpi_summary
+   * @summary Get Kpi Summary
+   * @request GET:/routes/kpi-summary
+   */
+  get_kpi_summary = (query: GetKpiSummaryParams, params: RequestParams = {}) =>
+    this.request<GetKpiSummaryData, GetKpiSummaryError>({
+      path: `/routes/kpi-summary`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+
+  /**
+   * @description Returns revenue data over a specified time period.
+   *
+   * @tags dbtn/module:dashboard, dbtn/hasAuth
+   * @name get_revenue_over_time
+   * @summary Get Revenue Over Time
+   * @request GET:/routes/revenue-over-time
+   */
+  get_revenue_over_time = (query: GetRevenueOverTimeParams, params: RequestParams = {}) =>
+    this.request<GetRevenueOverTimeData, GetRevenueOverTimeError>({
+      path: `/routes/revenue-over-time`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+
+  /**
+   * @description Returns the breakdown of invoices by status.
+   *
+   * @tags dbtn/module:dashboard, dbtn/hasAuth
+   * @name get_invoice_status_breakdown
+   * @summary Get Invoice Status Breakdown
+   * @request GET:/routes/invoice-status-breakdown
+   */
+  get_invoice_status_breakdown = (query: GetInvoiceStatusBreakdownParams, params: RequestParams = {}) =>
+    this.request<GetInvoiceStatusBreakdownData, GetInvoiceStatusBreakdownError>({
+      path: `/routes/invoice-status-breakdown`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+
+  /**
+   * @description Returns top 5 customers by revenue.
+   *
+   * @tags dbtn/module:dashboard, dbtn/hasAuth
+   * @name get_top_customers
+   * @summary Get Top Customers
+   * @request GET:/routes/top-customers
+   */
+  get_top_customers = (query: GetTopCustomersParams, params: RequestParams = {}) =>
+    this.request<GetTopCustomersData, GetTopCustomersError>({
+      path: `/routes/top-customers`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+
+  /**
+   * @description Returns the recent activity feed.
+   *
+   * @tags dbtn/module:dashboard, dbtn/hasAuth
+   * @name get_activity_feed
+   * @summary Get Activity Feed
+   * @request GET:/routes/activity-feed
+   */
+  get_activity_feed = (params: RequestParams = {}) =>
+    this.request<GetActivityFeedData, any>({
+      path: `/routes/activity-feed`,
+      method: "GET",
+      ...params,
+    });
+
+  /**
    * @description Get Stripe configuration for subscription management.
    *
    * @tags dbtn/module:subscriptions, dbtn/hasAuth
@@ -2013,6 +2068,21 @@ export class Brain<SecurityDataType = unknown> extends HttpClient<SecurityDataTy
     this.request<ConvertExpiredTrialsData, any>({
       path: `/routes/convert-expired-trials`,
       method: "POST",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags dbtn/module:health, dbtn/hasAuth
+   * @name health_check
+   * @summary Health Check
+   * @request GET:/routes/health-check
+   */
+  health_check = (params: RequestParams = {}) =>
+    this.request<HealthCheckData, any>({
+      path: `/routes/health-check`,
+      method: "GET",
       ...params,
     });
 }

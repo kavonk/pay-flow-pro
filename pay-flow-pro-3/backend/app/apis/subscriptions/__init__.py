@@ -43,17 +43,7 @@ class PublicSubscriptionPlanResponse(BaseModel):
     stripe_price_id_yearly: str
     slug: str
 
-class PublicSubscriptionPlanResponse(BaseModel):
-    id: str
-    name: str
-    slug: str
-    description: Optional[str] = None
-    price_monthly: float
-    price_yearly: Optional[float] = None
-    features: dict
-    invoice_limit: int
-    team_member_limit: int
-    dunning_rules_limit: int
+
     
 class SubscriptionPlanResponse(BaseModel):
     id: UUID

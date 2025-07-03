@@ -1,7 +1,7 @@
 import AppLayout from "components/AppLayout";
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '@stackframe/react';
+import { useUserGuardContext } from "app/auth";
 import { useCreateInvoice } from 'utils/queryHooks';
 import brain from 'brain';
 import {
@@ -124,15 +124,9 @@ type FormData = InvoiceFormData;
 interface CreateInvoiceProps {}
 
 const CreateInvoice: React.FC<CreateInvoiceProps> = () => {
-  const { user } = useUser();
+  const { user } = useUserGuardContext();
   
-  if (!user) {
-    return (
-      <AppLayout>
-        <div className="p-8">Loading...</div>
-      </AppLayout>
-    );
-  }
+  
   const navigate = useNavigate();
   const createInvoiceMutation = useCreateInvoice();
   const [showPayoutModal, setShowPayoutModal] = useState(false);

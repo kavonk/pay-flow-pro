@@ -1,7 +1,7 @@
 import AppLayout from "components/AppLayout";
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useUser } from '@stackframe/react';
+import { useUserGuardContext } from "app/auth";
 import { useInvoice } from 'utils/queryHooks';
 import brain from 'brain';
 import { InvoiceResponse } from 'types';
@@ -39,15 +39,9 @@ import { toast } from 'sonner';
 interface InvoiceDetailProps {}
 
 const InvoiceDetail: React.FC<InvoiceDetailProps> = () => {
-  const { user } = useUser();
+  const { user } = useUserGuardContext();
   
-  if (!user) {
-    return (
-      <AppLayout>
-        <div className="p-8">Loading...</div>
-      </AppLayout>
-    );
-  }
+  
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const invoiceId = searchParams.get('id');
