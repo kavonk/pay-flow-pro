@@ -440,6 +440,49 @@ export interface CronSetupInstructions {
   setup_instructions: string[];
 }
 
+/** Currency */
+export enum Currency {
+  EUR = "EUR",
+  USD = "USD",
+  GBP = "GBP",
+}
+
+/** Customer */
+export interface Customer {
+  /**
+   * Id
+   * @format uuid
+   */
+  id: string;
+  /** User Id */
+  user_id: string;
+  /**
+   * Account Id
+   * @format uuid
+   */
+  account_id: string;
+  /** Name */
+  name: string;
+  /** Email */
+  email: string;
+  /** Phone */
+  phone?: string | null;
+  /** Notes */
+  notes?: string | null;
+  /**
+   * Created At
+   * @format date-time
+   * @default "2025-07-03T10:15:15.778407Z"
+   */
+  created_at?: string;
+  /**
+   * Updated At
+   * @format date-time
+   * @default "2025-07-03T10:15:15.778408Z"
+   */
+  updated_at?: string;
+}
+
 /** CustomerPortalRequest */
 export interface CustomerPortalRequest {
   /**
@@ -447,6 +490,12 @@ export interface CustomerPortalRequest {
    * URL to return to after portal session
    */
   return_url: string;
+}
+
+/** CustomerPortalResponse */
+export interface CustomerPortalResponse {
+  /** Portal Url */
+  portal_url: string;
 }
 
 /** CustomerResponse */
@@ -578,12 +627,6 @@ export interface ExportStatsResponse {
   last_export_dates: Record<string, string | null>;
 }
 
-/** FeatureAccessResponse */
-export interface FeatureAccessResponse {
-  /** Has Access */
-  has_access: boolean;
-}
-
 /** FeePreviewRequest */
 export interface FeePreviewRequest {
   /** Payment Amount */
@@ -713,6 +756,80 @@ export interface InviteUserResponse {
   created_at: string;
 }
 
+/** Invoice */
+export interface Invoice {
+  /**
+   * Id
+   * @format uuid
+   */
+  id: string;
+  /** User Id */
+  user_id: string;
+  /**
+   * Account Id
+   * @format uuid
+   */
+  account_id: string;
+  /**
+   * Customer Id
+   * @format uuid
+   */
+  customer_id: string;
+  /** Amount */
+  amount: string;
+  /** @default "EUR" */
+  currency?: Currency;
+  /**
+   * Issue Date
+   * @format date
+   * @default "2025-07-03"
+   */
+  issue_date?: string;
+  /**
+   * Due Date
+   * @format date
+   * @default "2025-07-03"
+   */
+  due_date?: string;
+  /** Description */
+  description?: string | null;
+  /** Invoice Number */
+  invoice_number?: string | null;
+  /** Terms */
+  terms?: string | null;
+  /** Notes */
+  notes?: string | null;
+  /** Line Items */
+  line_items?: string | null;
+  /** Invoice Wide Tax Rate */
+  invoice_wide_tax_rate?: string | null;
+  /** Discount Type */
+  discount_type?: string | null;
+  /** Discount Value */
+  discount_value?: string | null;
+  /** @default "draft" */
+  status?: InvoiceStatus;
+  /** Stripe Payment Link Id */
+  stripe_payment_link_id?: string | null;
+  /** Stripe Payment Link Url */
+  stripe_payment_link_url?: string | null;
+  /**
+   * Created At
+   * @format date-time
+   * @default "2025-07-03T10:15:15.778868Z"
+   */
+  created_at?: string;
+  /**
+   * Updated At
+   * @format date-time
+   * @default "2025-07-03T10:15:15.778869Z"
+   */
+  updated_at?: string;
+  customer?: Customer | null;
+  /** Payments */
+  payments?: Payment[];
+}
+
 /** InvoiceNumberResponse */
 export interface InvoiceNumberResponse {
   /** Invoice Number */
@@ -785,6 +902,15 @@ export interface InvoiceResponse {
    * @format date-time
    */
   updated_at: string;
+}
+
+/** InvoiceStatus */
+export enum InvoiceStatus {
+  Draft = "draft",
+  Sent = "sent",
+  Paid = "paid",
+  Overdue = "overdue",
+  Cancelled = "cancelled",
 }
 
 /** InvoiceStatusBreakdownResponse */
@@ -975,6 +1101,69 @@ export interface NotificationResponse {
   notifications_sent: number;
   /** Message */
   message: string;
+}
+
+/** Payment */
+export interface Payment {
+  /**
+   * Id
+   * @format uuid
+   */
+  id: string;
+  /** User Id */
+  user_id: string;
+  /**
+   * Account Id
+   * @format uuid
+   */
+  account_id: string;
+  /**
+   * Invoice Id
+   * @format uuid
+   */
+  invoice_id: string;
+  method: PaymentMethod;
+  /** Amount */
+  amount: string;
+  /**
+   * Currency
+   * @default "EUR"
+   */
+  currency?: string;
+  /** Transaction Id */
+  transaction_id?: string | null;
+  /** Notes */
+  notes?: string | null;
+  /**
+   * Timestamp
+   * @format date-time
+   * @default "2025-07-03T10:15:15.779757Z"
+   */
+  timestamp?: string;
+  /** Stripe Payment Id */
+  stripe_payment_id?: string | null;
+  /**
+   * Created At
+   * @format date-time
+   * @default "2025-07-03T10:15:15.779760Z"
+   */
+  created_at?: string;
+  /**
+   * Updated At
+   * @format date-time
+   * @default "2025-07-03T10:15:15.779761Z"
+   */
+  updated_at?: string;
+  invoice?: Invoice | null;
+}
+
+/** PaymentMethod */
+export enum PaymentMethod {
+  Card = "card",
+  BankTransfer = "bank_transfer",
+  Cash = "cash",
+  Check = "check",
+  Other = "other",
 }
 
 /** PaymentReconciliationRequest */
@@ -1785,18 +1974,6 @@ export interface AppApisSettlementsSettlementSummary {
   next_payout_date?: string | null;
 }
 
-/** CustomerPortalResponse */
-export interface AppApisSubscriptionCustomerPortalResponse {
-  /** Url */
-  url: string;
-}
-
-/** CustomerPortalResponse */
-export interface AppApisSubscriptionsCustomerPortalResponse {
-  /** Portal Url */
-  portal_url: string;
-}
-
 /** StripeConfigResponse */
 export interface AppApisSubscriptionsStripeConfigResponse {
   /** Publishable Key */
@@ -2178,16 +2355,7 @@ export type AcceptInvitationPublic2Error = HTTPValidationError;
 
 export type GetMyRoleData = any;
 
-export interface GetSettlementSummaryParams {
-  /** Start Date */
-  start_date?: string | null;
-  /** End Date */
-  end_date?: string | null;
-}
-
-export type GetSettlementSummaryData = SettlementSummaryResponse;
-
-export type GetSettlementSummaryError = HTTPValidationError;
+export type GetSettlementSummaryData = AppApisSettlementsSettlementSummary;
 
 export interface GetTransfersParams {
   /**
@@ -2385,14 +2553,14 @@ export type UpdateInvoicePrefixData = UpdatePrefixResponse;
 
 export type UpdateInvoicePrefixError = HTTPValidationError;
 
-export type CreateInvoiceEndpointData = InvoiceResponse;
+export type CreateInvoiceEndpointData = Invoice;
 
 export type CreateInvoiceEndpointError = HTTPValidationError;
 
 export interface GetInvoicesEndpointParams {
   /**
    * Page
-   * Page number
+   * Page number for pagination
    * @min 1
    * @default 1
    */
@@ -2407,7 +2575,7 @@ export interface GetInvoicesEndpointParams {
   limit?: number;
   /**
    * Status
-   * Filter by status
+   * Filter by invoice status (e.g., 'paid', 'due', 'overdue')
    */
   status?: string | null;
   /**
@@ -2459,14 +2627,11 @@ export type GetInvoicesEndpointData = InvoicesListResponse;
 export type GetInvoicesEndpointError = HTTPValidationError;
 
 export interface GetInvoiceEndpointParams {
-  /**
-   * Invoice Id
-   * @format uuid
-   */
-  invoiceId: string;
+  /** Invoice Id */
+  invoiceId: number;
 }
 
-export type GetInvoiceEndpointData = InvoiceResponse;
+export type GetInvoiceEndpointData = Invoice;
 
 export type GetInvoiceEndpointError = HTTPValidationError;
 
@@ -2478,7 +2643,7 @@ export interface UpdateInvoiceEndpointParams {
   invoiceId: string;
 }
 
-export type UpdateInvoiceEndpointData = InvoiceResponse;
+export type UpdateInvoiceEndpointData = Invoice;
 
 export type UpdateInvoiceEndpointError = HTTPValidationError;
 
@@ -2584,17 +2749,6 @@ export type DeleteDunningRuleData = any;
 
 export type DeleteDunningRuleError = HTTPValidationError;
 
-export type CreateCustomerPortalData = AppApisSubscriptionCustomerPortalResponse;
-
-export interface GetSubscriptionFeatureAccessParams {
-  /** Feature Key */
-  feature_key: string;
-}
-
-export type GetSubscriptionFeatureAccessData = FeatureAccessResponse;
-
-export type GetSubscriptionFeatureAccessError = HTTPValidationError;
-
 export type GetFinancialStatsData = FinancialStatsResponse;
 
 export interface GetKpiSummaryParams {
@@ -2630,6 +2784,17 @@ export type GetInvoiceStatusBreakdownData = InvoiceStatusBreakdownResponse;
 
 export type GetInvoiceStatusBreakdownError = HTTPValidationError;
 
+export interface GetDashboardSettlementSummaryParams {
+  /** Start Date */
+  start_date?: string | null;
+  /** End Date */
+  end_date?: string | null;
+}
+
+export type GetDashboardSettlementSummaryData = SettlementSummaryResponse;
+
+export type GetDashboardSettlementSummaryError = HTTPValidationError;
+
 export interface GetTopCustomersParams {
   /** Start Date */
   start_date?: string | null;
@@ -2654,10 +2819,6 @@ export type GetCurrentSubscriptionData = UserSubscriptionResponse | null;
 export type StartTrialData = UserSubscriptionResponse;
 
 export type StartTrialError = HTTPValidationError;
-
-export type CreateCustomerPortal2Data = AppApisSubscriptionsCustomerPortalResponse;
-
-export type CreateCustomerPortal2Error = HTTPValidationError;
 
 export type CreateCheckoutSessionData = CheckoutSessionResponse;
 
@@ -2684,6 +2845,10 @@ export interface GetBillingHistoryParams {
 export type GetBillingHistoryData = BillingHistoryListResponse;
 
 export type GetBillingHistoryError = HTTPValidationError;
+
+export type CreateCustomerPortalData = CustomerPortalResponse;
+
+export type CreateCustomerPortalError = HTTPValidationError;
 
 /** Response Get Feature Access */
 export type GetFeatureAccessData = Record<string, any>;

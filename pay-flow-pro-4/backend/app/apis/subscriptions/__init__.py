@@ -482,18 +482,7 @@ async def _create_simple_payout_account_for_trial(user: AuthorizedUser, repo: Pa
         print("Trial creation will continue without payout account")
         # We don't raise the exception to avoid blocking trial signup
 
-@router.post("/customer-portal", response_model=CustomerPortalResponse)
-async def create_customer_portal(request: CustomerPortalRequest, user: AuthorizedUser) -> CustomerPortalResponse:
-    """Create a Stripe customer portal session for the user."""
-    repo = PaymentRepository(user.sub)
-    
-    # Get current subscription
-    subscription = await repo.get_user_subscription()
-    if not subscription:
-        raise HTTPException(
-            status_code=404, 
-            detail="No active subscription found. Please start a trial first."
-        )
+
     
     stripe_customer_id = subscription.stripe_customer_id
     

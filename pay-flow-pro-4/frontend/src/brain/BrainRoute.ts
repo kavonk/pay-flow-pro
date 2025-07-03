@@ -18,7 +18,6 @@ import {
   CreateCheckoutSessionData,
   CreateCheckoutSessionRequest,
   CreateCustomerEndpointData,
-  CreateCustomerPortal2Data,
   CreateCustomerPortalData,
   CreateCustomerRequest,
   CreateDunningRuleData,
@@ -62,6 +61,7 @@ import {
   GetCurrentSubscriptionData,
   GetCustomerEndpointData,
   GetCustomersEndpointData,
+  GetDashboardSettlementSummaryData,
   GetDunningRuleData,
   GetDunningRulesData,
   GetEnterpriseInquiriesData,
@@ -91,7 +91,6 @@ import {
   GetRevenueOverTimeData,
   GetSettlementSummaryData,
   GetStripeConfigData,
-  GetSubscriptionFeatureAccessData,
   GetSubscriptionPlansData,
   GetSubscriptionStripeConfigData,
   GetTeamInvitationsData,
@@ -816,20 +815,15 @@ export namespace Brain {
   }
 
   /**
-   * @description Returns settlement summary data.
-   * @tags dbtn/module:dashboard, dbtn/hasAuth
+   * @description Get settlement summary with fee breakdown.
+   * @tags dbtn/module:settlements, dbtn/hasAuth
    * @name get_settlement_summary
    * @summary Get Settlement Summary
    * @request GET:/routes/settlement-summary
    */
   export namespace get_settlement_summary {
     export type RequestParams = {};
-    export type RequestQuery = {
-      /** Start Date */
-      start_date?: string | null;
-      /** End Date */
-      end_date?: string | null;
-    };
+    export type RequestQuery = {};
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = GetSettlementSummaryData;
@@ -1527,11 +1521,11 @@ export namespace Brain {
   }
 
   /**
-   * @description Create a new invoice with Stripe payment link.
+   * @description Creates a new invoice.
    * @tags dbtn/module:invoices, dbtn/hasAuth
    * @name create_invoice_endpoint
    * @summary Create Invoice Endpoint
-   * @request POST:/routes/invoices/
+   * @request POST:/routes/invoices/invoices
    */
   export namespace create_invoice_endpoint {
     export type RequestParams = {};
@@ -1542,7 +1536,7 @@ export namespace Brain {
   }
 
   /**
-   * @description Get list of invoices with pagination and optional filters.
+   * @description Get a paginated and sortable list of invoices.
    * @tags dbtn/module:invoices, dbtn/hasAuth
    * @name get_invoices_endpoint
    * @summary Get Invoices Endpoint
@@ -1553,7 +1547,7 @@ export namespace Brain {
     export type RequestQuery = {
       /**
        * Page
-       * Page number
+       * Page number for pagination
        * @min 1
        * @default 1
        */
@@ -1568,7 +1562,7 @@ export namespace Brain {
       limit?: number;
       /**
        * Status
-       * Filter by status
+       * Filter by invoice status (e.g., 'paid', 'due', 'overdue')
        */
       status?: string | null;
       /**
@@ -1620,19 +1614,16 @@ export namespace Brain {
   }
 
   /**
-   * @description Get a specific invoice by ID.
+   * @description Gets a single invoice by its ID.
    * @tags dbtn/module:invoices, dbtn/hasAuth
    * @name get_invoice_endpoint
    * @summary Get Invoice Endpoint
-   * @request GET:/routes/invoices/{invoice_id}
+   * @request GET:/routes/invoices/invoices/{invoice_id}
    */
   export namespace get_invoice_endpoint {
     export type RequestParams = {
-      /**
-       * Invoice Id
-       * @format uuid
-       */
-      invoiceId: string;
+      /** Invoice Id */
+      invoiceId: number;
     };
     export type RequestQuery = {};
     export type RequestBody = never;
@@ -1953,39 +1944,6 @@ export namespace Brain {
   }
 
   /**
-   * @description Creates a Stripe customer portal session for the user to manage their subscription.
-   * @tags dbtn/module:subscription, dbtn/hasAuth
-   * @name create_customer_portal
-   * @summary Create Customer Portal
-   * @request POST:/routes/subscription/customer-portal
-   */
-  export namespace create_customer_portal {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = CreateCustomerPortalData;
-  }
-
-  /**
-   * @description Checks if the current user has access to a specific feature based on their subscription.
-   * @tags dbtn/module:subscription, dbtn/hasAuth
-   * @name get_subscription_feature_access
-   * @summary Get Subscription Feature Access
-   * @request GET:/routes/subscription/feature-access
-   */
-  export namespace get_subscription_feature_access {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Feature Key */
-      feature_key: string;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = GetSubscriptionFeatureAccessData;
-  }
-
-  /**
    * @description Returns the core financial stats for the main dashboard view. Combines total revenue/outstanding with invoice status counts.
    * @tags dbtn/module:dashboard, dbtn/hasAuth
    * @name get_financial_stats
@@ -2058,6 +2016,26 @@ export namespace Brain {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = GetInvoiceStatusBreakdownData;
+  }
+
+  /**
+   * @description Returns settlement summary data.
+   * @tags dbtn/module:dashboard, dbtn/hasAuth
+   * @name get_dashboard_settlement_summary
+   * @summary Get Dashboard Settlement Summary
+   * @request GET:/routes/dashboard-settlement-summary
+   */
+  export namespace get_dashboard_settlement_summary {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Start Date */
+      start_date?: string | null;
+      /** End Date */
+      end_date?: string | null;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = GetDashboardSettlementSummaryData;
   }
 
   /**
@@ -2156,23 +2134,6 @@ export namespace Brain {
   }
 
   /**
-   * @description Create Stripe Customer Portal session for payment method and billing management.
-   * @tags dbtn/module:subscriptions, dbtn/hasAuth
-   * @name create_customer_portal2
-   * @summary Create Customer Portal
-   * @request POST:/routes/customer-portal
-   * @originalName create_customer_portal
-   * @duplicate
-   */
-  export namespace create_customer_portal2 {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = CustomerPortalRequest;
-    export type RequestHeaders = {};
-    export type ResponseBody = CreateCustomerPortal2Data;
-  }
-
-  /**
    * @description Create a Stripe checkout session for subscription upgrade.
    * @tags dbtn/module:subscriptions, dbtn/hasAuth
    * @name create_checkout_session
@@ -2238,6 +2199,21 @@ export namespace Brain {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = GetBillingHistoryData;
+  }
+
+  /**
+   * @description Create Stripe Customer Portal session for payment method and billing management.
+   * @tags dbtn/module:subscriptions, dbtn/hasAuth
+   * @name create_customer_portal
+   * @summary Create Customer Portal
+   * @request POST:/routes/customer-portal
+   */
+  export namespace create_customer_portal {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = CustomerPortalRequest;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreateCustomerPortalData;
   }
 
   /**

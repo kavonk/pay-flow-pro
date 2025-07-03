@@ -71,8 +71,8 @@ async def get_financial_stats(user: AuthorizedUser):
     
     # Fetch KPI and invoice status data concurrently
     kpi_data, invoice_status_data = await asyncio.gather(
-        repo.get_kpi_summary_data(),
-        repo.get_invoice_status_breakdown()
+        repo.get_kpi_summary_data(user.sub),
+        repo.get_invoice_status_breakdown(user.sub)
     )
     
     # Structure the data into the response model
@@ -137,8 +137,8 @@ async def get_invoice_status_breakdown(
     status_data = await repo.get_invoice_status_breakdown(start_date, end_date)
     return InvoiceStatusBreakdownResponse(data=status_data)
 
-@router.get("/settlement-summary", response_model=SettlementSummaryResponse)
-async def get_settlement_summary(
+@router.get("/dashboard-settlement-summary", response_model=SettlementSummaryResponse)
+async def get_dashboard_settlement_summary(
     user: AuthorizedUser,
     start_date: Optional[datetime] = None,
     end_date: Optional[datetime] = None,

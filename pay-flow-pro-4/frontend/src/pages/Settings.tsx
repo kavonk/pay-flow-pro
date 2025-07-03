@@ -229,7 +229,7 @@ const Settings = () => {
     try {
       setManagingBilling(true);
       const response = await brain.create_customer_portal({
-        return_url: window.location.href
+        return_url: window.location.href,
       });
       
       if (response.ok) {

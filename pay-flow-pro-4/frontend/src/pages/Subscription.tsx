@@ -135,34 +135,20 @@ const SubscriptionPage = () => {
     }
   };
 
-  const handleManageBilling = async () => {
-    try {
-      const response = await brain.create_customer_portal({
-        return_url: window.location.href
-      });
-      
-      if (response.ok) {
-        const { portal_url } = await response.json();
-        // Open Customer Portal in same tab
-        window.location.href = portal_url;
-      } else {
-        const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
-        console.error('Customer portal error:', errorData);
-        
-        // Show user-friendly error message with instructions
-        toast.error(
-          'Unable to open billing portal. Please contact support at support@payflowpro.com for payment method updates.',
-          { duration: 8000 }
-        );
+  const { mutate: handleManageBilling, isPending: isManagingBilling } = useMutation({
+    mutationFn: async () => {
+      try {
+        const response = await brain.create_customer_portal_endpoint({
+          return_url: window.location.href,
+        });
+        const data = await response.json();
+        window.location.href = data.url;
+      } catch (error) {
+        console.error("Error creating customer portal session:", error);
+        toast.error("Failed to open billing settings. Please try again later.");
       }
-    } catch (error: any) {
-      console.error('Customer portal error:', error);
-      toast.error(
-        'Unable to open billing portal. Please contact support at support@payflowpro.com for payment method updates.',
-        { duration: 8000 }
-      );
-    }
-  };
+    },
+  });
 
   const handleContactSales = () => {
     // Open email client or show contact info

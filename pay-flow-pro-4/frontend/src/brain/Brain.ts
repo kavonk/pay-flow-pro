@@ -27,9 +27,8 @@ import {
   CreateCheckoutSessionRequest,
   CreateCustomerEndpointData,
   CreateCustomerEndpointError,
-  CreateCustomerPortal2Data,
-  CreateCustomerPortal2Error,
   CreateCustomerPortalData,
+  CreateCustomerPortalError,
   CreateCustomerRequest,
   CreateDunningRuleData,
   CreateDunningRuleError,
@@ -103,6 +102,9 @@ import {
   GetCustomersEndpointData,
   GetCustomersEndpointError,
   GetCustomersEndpointParams,
+  GetDashboardSettlementSummaryData,
+  GetDashboardSettlementSummaryError,
+  GetDashboardSettlementSummaryParams,
   GetDunningRuleData,
   GetDunningRuleError,
   GetDunningRuleParams,
@@ -162,12 +164,7 @@ import {
   GetRevenueOverTimeError,
   GetRevenueOverTimeParams,
   GetSettlementSummaryData,
-  GetSettlementSummaryError,
-  GetSettlementSummaryParams,
   GetStripeConfigData,
-  GetSubscriptionFeatureAccessData,
-  GetSubscriptionFeatureAccessError,
-  GetSubscriptionFeatureAccessParams,
   GetSubscriptionPlansData,
   GetSubscriptionStripeConfigData,
   GetTeamInvitationsData,
@@ -720,18 +717,17 @@ export class Brain<SecurityDataType = unknown> extends HttpClient<SecurityDataTy
     });
 
   /**
-   * @description Returns settlement summary data.
+   * @description Get settlement summary with fee breakdown.
    *
-   * @tags dbtn/module:dashboard, dbtn/hasAuth
+   * @tags dbtn/module:settlements, dbtn/hasAuth
    * @name get_settlement_summary
    * @summary Get Settlement Summary
    * @request GET:/routes/settlement-summary
    */
-  get_settlement_summary = (query: GetSettlementSummaryParams, params: RequestParams = {}) =>
-    this.request<GetSettlementSummaryData, GetSettlementSummaryError>({
+  get_settlement_summary = (params: RequestParams = {}) =>
+    this.request<GetSettlementSummaryData, any>({
       path: `/routes/settlement-summary`,
       method: "GET",
-      query: query,
       ...params,
     });
 
@@ -1416,16 +1412,16 @@ export class Brain<SecurityDataType = unknown> extends HttpClient<SecurityDataTy
     });
 
   /**
-   * @description Create a new invoice with Stripe payment link.
+   * @description Creates a new invoice.
    *
    * @tags dbtn/module:invoices, dbtn/hasAuth
    * @name create_invoice_endpoint
    * @summary Create Invoice Endpoint
-   * @request POST:/routes/invoices/
+   * @request POST:/routes/invoices/invoices
    */
   create_invoice_endpoint = (data: CreateInvoiceRequest, params: RequestParams = {}) =>
     this.request<CreateInvoiceEndpointData, CreateInvoiceEndpointError>({
-      path: `/routes/invoices/`,
+      path: `/routes/invoices/invoices`,
       method: "POST",
       body: data,
       type: ContentType.Json,
@@ -1433,7 +1429,7 @@ export class Brain<SecurityDataType = unknown> extends HttpClient<SecurityDataTy
     });
 
   /**
-   * @description Get list of invoices with pagination and optional filters.
+   * @description Get a paginated and sortable list of invoices.
    *
    * @tags dbtn/module:invoices, dbtn/hasAuth
    * @name get_invoices_endpoint
@@ -1449,16 +1445,16 @@ export class Brain<SecurityDataType = unknown> extends HttpClient<SecurityDataTy
     });
 
   /**
-   * @description Get a specific invoice by ID.
+   * @description Gets a single invoice by its ID.
    *
    * @tags dbtn/module:invoices, dbtn/hasAuth
    * @name get_invoice_endpoint
    * @summary Get Invoice Endpoint
-   * @request GET:/routes/invoices/{invoice_id}
+   * @request GET:/routes/invoices/invoices/{invoice_id}
    */
   get_invoice_endpoint = ({ invoiceId, ...query }: GetInvoiceEndpointParams, params: RequestParams = {}) =>
     this.request<GetInvoiceEndpointData, GetInvoiceEndpointError>({
-      path: `/routes/invoices/${invoiceId}`,
+      path: `/routes/invoices/invoices/${invoiceId}`,
       method: "GET",
       ...params,
     });
@@ -1754,37 +1750,6 @@ export class Brain<SecurityDataType = unknown> extends HttpClient<SecurityDataTy
     });
 
   /**
-   * @description Creates a Stripe customer portal session for the user to manage their subscription.
-   *
-   * @tags dbtn/module:subscription, dbtn/hasAuth
-   * @name create_customer_portal
-   * @summary Create Customer Portal
-   * @request POST:/routes/subscription/customer-portal
-   */
-  create_customer_portal = (params: RequestParams = {}) =>
-    this.request<CreateCustomerPortalData, any>({
-      path: `/routes/subscription/customer-portal`,
-      method: "POST",
-      ...params,
-    });
-
-  /**
-   * @description Checks if the current user has access to a specific feature based on their subscription.
-   *
-   * @tags dbtn/module:subscription, dbtn/hasAuth
-   * @name get_subscription_feature_access
-   * @summary Get Subscription Feature Access
-   * @request GET:/routes/subscription/feature-access
-   */
-  get_subscription_feature_access = (query: GetSubscriptionFeatureAccessParams, params: RequestParams = {}) =>
-    this.request<GetSubscriptionFeatureAccessData, GetSubscriptionFeatureAccessError>({
-      path: `/routes/subscription/feature-access`,
-      method: "GET",
-      query: query,
-      ...params,
-    });
-
-  /**
    * @description Returns the core financial stats for the main dashboard view. Combines total revenue/outstanding with invoice status counts.
    *
    * @tags dbtn/module:dashboard, dbtn/hasAuth
@@ -1842,6 +1807,22 @@ export class Brain<SecurityDataType = unknown> extends HttpClient<SecurityDataTy
   get_invoice_status_breakdown = (query: GetInvoiceStatusBreakdownParams, params: RequestParams = {}) =>
     this.request<GetInvoiceStatusBreakdownData, GetInvoiceStatusBreakdownError>({
       path: `/routes/invoice-status-breakdown`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+
+  /**
+   * @description Returns settlement summary data.
+   *
+   * @tags dbtn/module:dashboard, dbtn/hasAuth
+   * @name get_dashboard_settlement_summary
+   * @summary Get Dashboard Settlement Summary
+   * @request GET:/routes/dashboard-settlement-summary
+   */
+  get_dashboard_settlement_summary = (query: GetDashboardSettlementSummaryParams, params: RequestParams = {}) =>
+    this.request<GetDashboardSettlementSummaryData, GetDashboardSettlementSummaryError>({
+      path: `/routes/dashboard-settlement-summary`,
       method: "GET",
       query: query,
       ...params,
@@ -1941,25 +1922,6 @@ export class Brain<SecurityDataType = unknown> extends HttpClient<SecurityDataTy
     });
 
   /**
-   * @description Create Stripe Customer Portal session for payment method and billing management.
-   *
-   * @tags dbtn/module:subscriptions, dbtn/hasAuth
-   * @name create_customer_portal2
-   * @summary Create Customer Portal
-   * @request POST:/routes/customer-portal
-   * @originalName create_customer_portal
-   * @duplicate
-   */
-  create_customer_portal2 = (data: CustomerPortalRequest, params: RequestParams = {}) =>
-    this.request<CreateCustomerPortal2Data, CreateCustomerPortal2Error>({
-      path: `/routes/customer-portal`,
-      method: "POST",
-      body: data,
-      type: ContentType.Json,
-      ...params,
-    });
-
-  /**
    * @description Create a Stripe checkout session for subscription upgrade.
    *
    * @tags dbtn/module:subscriptions, dbtn/hasAuth
@@ -2023,6 +1985,23 @@ export class Brain<SecurityDataType = unknown> extends HttpClient<SecurityDataTy
       path: `/routes/billing-history`,
       method: "GET",
       query: query,
+      ...params,
+    });
+
+  /**
+   * @description Create Stripe Customer Portal session for payment method and billing management.
+   *
+   * @tags dbtn/module:subscriptions, dbtn/hasAuth
+   * @name create_customer_portal
+   * @summary Create Customer Portal
+   * @request POST:/routes/customer-portal
+   */
+  create_customer_portal = (data: CustomerPortalRequest, params: RequestParams = {}) =>
+    this.request<CreateCustomerPortalData, CreateCustomerPortalError>({
+      path: `/routes/customer-portal`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
       ...params,
     });
 

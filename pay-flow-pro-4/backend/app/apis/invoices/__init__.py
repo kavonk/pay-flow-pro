@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, status
 from pydantic import BaseModel, Field
 from typing import List, Optional
 from uuid import UUID
@@ -83,102 +83,37 @@ class InvoicesListResponse(BaseModel):
     limit: int
     has_next: bool
 
+class InvoiceUpdate(BaseModel):
+    customer_id: Optional[UUID] = None
+    amount: Optional[Decimal] = None
+    due_date: Optional[date] = None
+    status: Optional[str] = None
+
+
 class SendInvoiceRequest(BaseModel):
     invoice_id: UUID = Field(..., description="Invoice ID to send")
     email_message: Optional[str] = Field(None, max_length=1000, description="Custom message to include in email")
 
-@router.post("/", response_model=InvoiceResponse)
-async def create_invoice_endpoint(request: CreateInvoiceRequest, user: AuthorizedUser):
-    """Create a new invoice with Stripe payment link."""
+@router.post("/invoices", response_model=Invoice)
+async def create_invoice_endpoint(
+    request: CreateInvoiceRequest, user: AuthorizedUser
+) -> Invoice:
+    """Creates a new invoice."""
+    repo = PaymentRepository(user.sub)
     try:
-        print(f"Creating invoice for user {user.sub}")
-        repo = PaymentRepository(user.sub)
-        
-        # Validate customer exists
-        print(f"Validating customer {request.customer_id}")
-        customer = await repo.get_customer(request.customer_id)
-        if not customer:
-            print(f"Customer {request.customer_id} not found")
-            raise HTTPException(status_code=404, detail="Customer not found")
-        
-        # Validate currency
-        if request.currency not in ["EUR", "USD"]:
-            print(f"Invalid currency: {request.currency}")
-            raise HTTPException(status_code=400, detail="Currency must be EUR or USD")
-        
-        # Validate dates
-        if request.due_date < request.issue_date:
-            print(f"Invalid dates: due_date {request.due_date} < issue_date {request.issue_date}")
-            raise HTTPException(status_code=400, detail="Due date must be after issue date")
-        
-        # Get account_id for the invoice
-        print("Getting account_id for user")
-        account_id = await repo._get_user_account_id()
-        print(f"Account ID: {account_id}")
-        
-        # Create invoice using factory function
-        currency_enum = Currency.EUR if request.currency == "EUR" else Currency.USD
-        
-        print("Creating invoice object")
-        invoice = create_invoice(
-            user_id=user.sub,
-            account_id=account_id,
-            customer_id=request.customer_id,
-            amount=request.amount,
-            currency=currency_enum,
-            issue_date=request.issue_date,
-            due_date=request.due_date,
-            description=request.description,
-            invoice_number=request.invoice_number,
-            terms=request.terms,
-            notes=request.notes
-        )
-        print(f"Invoice object created with ID: {invoice.id}")
-        
-        # Save to database
-        print("Saving invoice to database")
-        created_invoice = await repo.create_invoice(invoice)
-        print(f"Invoice saved successfully with ID: {created_invoice.id}")
-        
-        return InvoiceResponse(
-            id=created_invoice.id,
-            customer_id=created_invoice.customer_id,
-            customer_name=customer.name,
-            customer_email=customer.email,
-            invoice_number=created_invoice.invoice_number,
-            amount=created_invoice.amount,
-            currency=created_invoice.currency,
-            issue_date=created_invoice.issue_date,
-            due_date=created_invoice.due_date,
-            description=created_invoice.description,
-            terms=created_invoice.terms,
-            notes=created_invoice.notes,
-            status=created_invoice.status.value,
-            stripe_payment_link_id=created_invoice.stripe_payment_link_id,
-            stripe_payment_link_url=created_invoice.stripe_payment_link_url,
-            created_at=created_invoice.created_at,
-            updated_at=created_invoice.updated_at
-        )
-        
-    except HTTPException:
-        # Re-raise HTTP exceptions (they have proper status codes)
-        raise
+        invoice_data = request.model_dump()
+        new_invoice = await repo.create_invoice(invoice_data)
+        return Invoice.model_validate(new_invoice)
     except Exception as e:
-        print(f"Unexpected error creating invoice: {str(e)}")
-        print(f"Error type: {type(e).__name__}")
-        import traceback
-        print(f"Traceback: {traceback.format_exc()}")
-        raise HTTPException(
-            status_code=500, 
-            detail=f"Internal server error: {str(e)}"
-        )
+        print(f"Error creating invoice: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/", response_model=InvoicesListResponse)
 async def get_invoices_endpoint(
     user: AuthorizedUser,
-    page: int = Query(1, ge=1, description="Page number"),
+    page: int = Query(1, ge=1, description="Page number for pagination"),
     limit: int = Query(20, ge=1, le=100, description="Items per page"),
-    status: Optional[str] = Query(None, description="Filter by status"),
+    status: Optional[str] = Query(None, description="Filter by invoice status (e.g., 'paid', 'due', 'overdue')"),
     customer_id: Optional[UUID] = Query(None, description="Filter by customer ID"),
     search: Optional[str] = Query(None, description="Search term for customer name, description, or invoice details"),
     # Date range filters
@@ -190,7 +125,7 @@ async def get_invoices_endpoint(
     sort_by: Optional[str] = Query("created_at", description="Sort field: created_at, issue_date, due_date, amount, status, customer_name"),
     sort_order: Optional[str] = Query("desc", description="Sort order: asc or desc")
 ):
-    """Get list of invoices with pagination and optional filters."""
+    """Get a paginated and sortable list of invoices."""
     try:
         repo = PaymentRepository(user.sub)
         
@@ -261,168 +196,70 @@ async def get_invoices_endpoint(
             has_next=has_next
         )
         
-    except Exception as e:
-        print(f"Error fetching invoices: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to fetch invoices")
-
-@router.get("/{invoice_id}", response_model=InvoiceResponse)
-async def get_invoice_endpoint(invoice_id: UUID, user: AuthorizedUser):
-    """Get a specific invoice by ID."""
-    try:
-        repo = PaymentRepository(user.sub)
-        invoice = await repo.get_invoice(invoice_id)
-        
-        if not invoice:
-            raise HTTPException(status_code=404, detail="Invoice not found")
-        
-        # Get customer details
-        customer = await repo.get_customer(invoice.customer_id)
-        if not customer:
-            raise HTTPException(status_code=404, detail="Customer not found")
-        
-        return InvoiceResponse(
-            id=invoice.id,
-            customer_id=invoice.customer_id,
-            customer_name=customer.name,
-            customer_email=customer.email,
-            amount=invoice.amount,
-            currency=invoice.currency,
-            issue_date=invoice.issue_date,
-            due_date=invoice.due_date,
-            description=invoice.description,
-            status=invoice.status.value,
-            stripe_payment_link_id=invoice.stripe_payment_link_id,
-            stripe_payment_link_url=invoice.stripe_payment_link_url,
-            created_at=invoice.created_at,
-            updated_at=invoice.updated_at
-        )
-        
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Error fetching invoice: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to fetch invoice")
+        print(f"Error fetching invoices: {str(e)}")
+        import traceback
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail="Internal server error")
 
-@router.put("/{invoice_id}", response_model=InvoiceResponse)
-async def update_invoice_endpoint(invoice_id: UUID, request: UpdateInvoiceRequest, user: AuthorizedUser):
+@router.get("/invoices/{invoice_id}", response_model=Invoice)
+async def get_invoice_endpoint(user: AuthorizedUser, invoice_id: int) -> Invoice:
+    """Gets a single invoice by its ID."""
+    repo = PaymentRepository(user.sub)
+    invoice = await repo.get_invoice(invoice_id)
+    if not invoice:
+        raise HTTPException(status_code=404, detail="Invoice not found")
+    return Invoice.model_validate(invoice)
+
+@router.put("/{invoice_id}", response_model=Invoice)
+async def update_invoice_endpoint(
+    invoice_id: UUID,
+    invoice_data: UpdateInvoiceRequest,
+    user: AuthorizedUser
+):
     """Update an existing invoice."""
     try:
         repo = PaymentRepository(user.sub)
         
-        # Get existing invoice
+        # Verify invoice exists
         existing_invoice = await repo.get_invoice(invoice_id)
         if not existing_invoice:
             raise HTTPException(status_code=404, detail="Invoice not found")
         
-        # Update only provided fields
-        if request.customer_id is not None:
-            # Validate customer exists
-            customer = await repo.get_customer(request.customer_id)
-            if not customer:
-                raise HTTPException(status_code=404, detail="Customer not found")
-            existing_invoice.customer_id = request.customer_id
-            
-        if request.invoice_number is not None:
-            existing_invoice.invoice_number = request.invoice_number
-        if request.amount is not None:
-            existing_invoice.amount = request.amount
-        if request.currency is not None:
-            if request.currency not in ["EUR", "USD"]:
-                raise HTTPException(status_code=400, detail="Currency must be EUR or USD")
-            # Convert string currency to enum
-            existing_invoice.currency = Currency.EUR if request.currency == "EUR" else Currency.USD
-        if request.issue_date is not None:
-            existing_invoice.issue_date = request.issue_date
-        if request.due_date is not None:
-            existing_invoice.due_date = request.due_date
-        if request.description is not None:
-            existing_invoice.description = request.description
-        if request.terms is not None:
-            existing_invoice.terms = request.terms
-        if request.notes is not None:
-            existing_invoice.notes = request.notes
-        if request.line_items is not None:
-            existing_invoice.line_items = request.line_items
-        if request.invoice_wide_tax_rate is not None:
-            existing_invoice.invoice_wide_tax_rate = request.invoice_wide_tax_rate
-        if request.discount_type is not None:
-            if request.discount_type not in ["percentage", "fixed"]:
-                raise HTTPException(status_code=400, detail="Discount type must be 'percentage' or 'fixed'")
-            existing_invoice.discount_type = request.discount_type
-        if request.discount_value is not None:
-            existing_invoice.discount_value = request.discount_value
-        if request.status is not None:
-            try:
-                existing_invoice.status = InvoiceStatus(request.status)
-            except ValueError:
-                raise HTTPException(status_code=400, detail="Invalid status")
-        
-        # Validate dates
-        if existing_invoice.due_date < existing_invoice.issue_date:
-            raise HTTPException(status_code=400, detail="Due date must be after issue date")
-        
-        # Save updated invoice
-        updated_invoice = await repo.update_invoice(existing_invoice)
+        # Perform the update
+        updated_invoice = await repo.update_invoice(invoice_id, invoice_data.model_dump(exclude_unset=True))
         
         if not updated_invoice:
-            raise HTTPException(status_code=404, detail="Invoice not found")
-        
-        # Get customer details
-        customer = await repo.get_customer(updated_invoice.customer_id)
-        if not customer:
-            raise HTTPException(status_code=404, detail="Customer not found")
-        
-        return InvoiceResponse(
-            id=updated_invoice.id,
-            customer_id=updated_invoice.customer_id,
-            customer_name=customer.name,
-            customer_email=customer.email,
-            invoice_number=updated_invoice.invoice_number,
-            amount=updated_invoice.amount,
-            currency=updated_invoice.currency.value,
-            issue_date=updated_invoice.issue_date,
-            due_date=updated_invoice.due_date,
-            description=updated_invoice.description,
-            terms=updated_invoice.terms,
-            notes=updated_invoice.notes,
-            line_items=updated_invoice.line_items,
-            invoice_wide_tax_rate=updated_invoice.invoice_wide_tax_rate,
-            discount_type=updated_invoice.discount_type,
-            discount_value=updated_invoice.discount_value,
-            status=updated_invoice.status.value,
-            stripe_payment_link_id=updated_invoice.stripe_payment_link_id,
-            stripe_payment_link_url=updated_invoice.stripe_payment_link_url,
-            created_at=updated_invoice.created_at,
-            updated_at=updated_invoice.updated_at
-        )
+            # This might occur if the update fails for some reason
+            raise HTTPException(status_code=500, detail="Failed to update invoice")
+            
+        return Invoice.model_validate(updated_invoice)
         
     except HTTPException:
         raise
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         print(f"Error updating invoice: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to update invoice")
+        raise HTTPException(status_code=500, detail="An unexpected error occurred")
 
-@router.delete("/{invoice_id}")
+@router.delete("/{invoice_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_invoice_endpoint(invoice_id: UUID, user: AuthorizedUser):
     """Delete an invoice."""
     try:
         repo = PaymentRepository(user.sub)
         
-        # Check if invoice exists
+        # Check if the invoice exists before attempting deletion
         existing_invoice = await repo.get_invoice(invoice_id)
         if not existing_invoice:
             raise HTTPException(status_code=404, detail="Invoice not found")
-        
-        # Delete the invoice
+            
         success = await repo.delete_invoice(invoice_id)
         
         if not success:
-            raise HTTPException(status_code=404, detail="Invoice not found")
-        
-        return {"message": "Invoice deleted successfully"}
-        
+            # This case might be redundant if get_invoice check is solid
+            raise HTTPException(status_code=404, detail="Invoice not found for deletion")
+            
     except HTTPException:
         raise
     except Exception as e:
@@ -526,7 +363,7 @@ async def send_invoice_endpoint(request: SendInvoiceRequest, user: AuthorizedUse
                 raise HTTPException(status_code=400, detail=f"Could not create payment link: {str(stripe_error)}")
         
         # Get branding settings for email customization
-        branding_settings = await get_branding_settings_for_user(user.sub)
+        branding_settings = await repo.get_branding_settings()
         company_name = branding_settings.get('company_name') if branding_settings else 'PayFlow Pro'
         primary_color = branding_settings.get('primary_color') if branding_settings else '#007cba'
         business_email = branding_settings.get('business_email') if branding_settings else None
@@ -677,57 +514,4 @@ async def send_invoice_endpoint(request: SendInvoiceRequest, user: AuthorizedUse
         print(f"Full traceback: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=f"Failed to send invoice: {str(e)}")
 
-# Helper functions for branding integration
-async def get_database_connection():
-    """Get database connection for invoices API."""
-    database_url = db.secrets.get("DATABASE_URL_DEV")
-    if not database_url:
-        raise HTTPException(status_code=500, detail="Database connection not configured")
-    return await asyncpg.connect(database_url)
 
-async def get_branding_settings_for_user(user_id: str) -> dict | None:
-    """Get branding settings for a user."""
-    try:
-        account_id = await get_user_account_id(user_id)
-        conn = await get_database_connection()
-        try:
-            result = await conn.fetchrow(
-                "SELECT * FROM branding_settings WHERE account_id = $1",
-                account_id
-            )
-            if result:
-                return dict(result)
-            return None
-        finally:
-            await conn.close()
-    except Exception as e:
-        print(f"Error getting branding settings: {str(e)}")
-        return None
-
-async def get_user_account_id(user_id: str) -> UUID:
-    """Get account ID for the user."""
-    conn = await get_database_connection()
-    try:
-        # Try to get existing account
-        result = await conn.fetchrow(
-            "SELECT account_id FROM user_accounts WHERE user_id = $1",
-            user_id
-        )
-        
-        if result:
-            return UUID(str(result['account_id']))
-        
-        # If user doesn't exist in user_accounts, create a new account entry
-        account_id = uuid4()
-        await conn.execute(
-            """
-            INSERT INTO user_accounts (id, user_id, account_id, role, created_at, updated_at)
-            VALUES ($1, $2, $3, 'owner', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-            """,
-            uuid4(), user_id, account_id
-        )
-        
-        return account_id
-        
-    finally:
-        await conn.close()
