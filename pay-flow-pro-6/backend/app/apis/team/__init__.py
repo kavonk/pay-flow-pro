@@ -5,6 +5,7 @@ from uuid import UUID, uuid4
 from datetime import datetime, timezone, timedelta
 import databutton as db
 
+from app import auth as app_auth
 from app.auth import AuthorizedUser
 from app.libs.repository import PaymentRepository
 from app.libs.models import TeamInvitation, UserRole, UserAccount
@@ -504,25 +505,36 @@ async def accept_invitation_public2(request: AcceptInvitationPublicRequest):
         if invitation.email.lower() != request.email.lower():
             raise HTTPException(status_code=400, detail="Email does not match invitation")
         
-        # TODO: Integrate with Stack Auth to create user account
-        # For now, we'll create a placeholder user_id and handle account creation
-        
-        # This is where we would:
-        # 1. Create Stack Auth user with email/password
-        # 2. Get the new user ID from Stack Auth
-        # 3. Accept the invitation with the new user ID
-        
-        # Placeholder implementation - in real implementation, we'd get user_id from Stack Auth
-        import uuid
-        new_user_id = str(uuid.uuid4())  # This should come from Stack Auth
-        
-        # Accept the invitation
-        success = await repo.accept_invitation(request.token, new_user_id)
+        # Create user in Stack Auth
+        try:
+            new_user = app_auth.stack_auth.users.create(
+                email=request.email,
+                password=request.password,
+                # You can add more user details here if needed
+                # first_name=request.first_name,
+                # last_name=request.last_name,
+            )
+            new_user_id = new_user['id']
+            print(f"Successfully created user in Stack Auth with ID: {new_user_id}")
+        except Exception as e:
+            # Check if user already exists
+            if "already exists" in str(e):
+                raise HTTPException(
+                    status_code=409, 
+                    detail="A user with this email already exists. Please sign in to accept the invitation."
+                )
+            print(f"Failed to create user in Stack Auth: {str(e)}")
+            raise HTTPException(status_code=500, detail="Could not create user account.")
+
+        # Accept the invitation for the newly created user
+        success = await repo.accept_invitation_for_user(request.token, new_user_id)
         if not success:
-            raise HTTPException(status_code=400, detail="Failed to accept invitation")
+            # This could happen if the invitation was already accepted, which is unlikely here
+            # but good to handle.
+            raise HTTPException(status_code=400, detail="Failed to link invitation to the new user.")
         
         return {
-            "message": "Successfully joined the team", 
+            "message": "Account created and successfully joined the team", 
             "account_id": str(invitation.account_id),
             "user_id": new_user_id,
             "email": request.email
