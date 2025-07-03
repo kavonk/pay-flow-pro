@@ -472,13 +472,13 @@ export interface Customer {
   /**
    * Created At
    * @format date-time
-   * @default "2025-07-03T10:15:15.778407Z"
+   * @default "2025-07-03T10:38:53.074232Z"
    */
   created_at?: string;
   /**
    * Updated At
    * @format date-time
-   * @default "2025-07-03T10:15:15.778408Z"
+   * @default "2025-07-03T10:38:53.074234Z"
    */
   updated_at?: string;
 }
@@ -816,13 +816,13 @@ export interface Invoice {
   /**
    * Created At
    * @format date-time
-   * @default "2025-07-03T10:15:15.778868Z"
+   * @default "2025-07-03T10:38:53.074748Z"
    */
   created_at?: string;
   /**
    * Updated At
    * @format date-time
-   * @default "2025-07-03T10:15:15.778869Z"
+   * @default "2025-07-03T10:38:53.074749Z"
    */
   updated_at?: string;
   customer?: Customer | null;
@@ -1137,7 +1137,7 @@ export interface Payment {
   /**
    * Timestamp
    * @format date-time
-   * @default "2025-07-03T10:15:15.779757Z"
+   * @default "2025-07-03T10:38:53.075990Z"
    */
   timestamp?: string;
   /** Stripe Payment Id */
@@ -1145,13 +1145,13 @@ export interface Payment {
   /**
    * Created At
    * @format date-time
-   * @default "2025-07-03T10:15:15.779760Z"
+   * @default "2025-07-03T10:38:53.075994Z"
    */
   created_at?: string;
   /**
    * Updated At
    * @format date-time
-   * @default "2025-07-03T10:15:15.779761Z"
+   * @default "2025-07-03T10:38:53.075995Z"
    */
   updated_at?: string;
   invoice?: Invoice | null;

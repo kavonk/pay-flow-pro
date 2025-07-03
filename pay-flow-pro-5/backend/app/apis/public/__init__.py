@@ -135,10 +135,10 @@ async def create_account_link_public(request: CreateAccountLinkRequest):
         
         stripe_account_id = None
         if existing_account:
-            stripe_account_id = existing_account.stripe_account_id
+            stripe_account_id = existing_account['stripe_account_id']
             
             # If account is already active, return error
-            if existing_account.account_status == PayoutAccountStatus.ACTIVE:
+            if existing_account['status'] == PayoutAccountStatus.ACTIVE:
                 raise HTTPException(
                     status_code=400, 
                     detail="Account is already active and onboarding is complete"
