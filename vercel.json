@@ -11,7 +11,8 @@
       "src": "backend/main.py",
       "use": "@vercel/python",
       "config": {
-        "runtime": "python3.11"
+        "runtime": "python3.11",
+        "pythonVersion": "3.11"
       }
     }
   ],
