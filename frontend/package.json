@@ -229,7 +229,7 @@
     "german-verbs": "5.4.0",
     "german-verbs-dict": "3.4.0",
     "grapejs": "^2.1.2",
-    "grapesjs": "0.22.5",
+    "grapesjs": "^0.19.5",
     "grapesjs-react": "4.0.2",
     "heic2any": "0.0.4",
     "hls.js": "1.6.5",
