@@ -18,5 +18,10 @@ selenium
 aiohttp
 pytest
 pytest-asyncio
+uvicorn[standard]==0.34.2
+ipykernel==6.29.5
+fastapi==0.115.12
+databutton==0.38.34
+python-multipart==0.0.9
 sqlalchemy
 psycopg2-binary
