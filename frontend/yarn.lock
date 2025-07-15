@@ -28327,7 +28327,7 @@ __metadata:
     "@solana/wallet-adapter-wallets": "npm:0.19.32"
     "@solana/web3.js": "npm:1"
     "@splinetool/react-spline": "npm:4.0.0"
-    "@stackframe/react": "patch:@stackframe/react@npm%3A2.8.12#~/.yarn/patches/@stackframe-react-npm-2.8.12-81578128be.patch"
+    "@stackframe/react": "2.8.12"
     "@storyblok/react": "npm:4.6.1"
     "@stripe/firestore-stripe-payments": "npm:0.0.6"
     "@stripe/react-stripe-js": "npm:2.9.0"
