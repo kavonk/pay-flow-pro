@@ -1,0 +1,27 @@
+# Workspace version: 1.46.32
+databutton==0.38.34
+ipykernel==6.29.5
+fastapi==0.115.12
+python-multipart==0.0.9
+uvicorn[standard]==0.34.2
+
+openai
+beautifulsoup4
+requests
+asyncpg
+pydantic[email]
+stripe
+Pillow
+apscheduler
+boto3
+selenium
+aiohttp
+pytest
+pytest-asyncio
+uvicorn[standard]==0.34.2
+ipykernel==6.29.5
+fastapi==0.115.12
+databutton==0.38.34
+python-multipart==0.0.9
+sqlalchemy
+psycopg2-binary
