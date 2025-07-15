@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "workspaces": ["frontend"],
+  "scripts": {
+    "prepare": "patch-package"
+  },
+  "devDependencies": {
+    "patch-package": "^8.0.0"
+  }
+}
