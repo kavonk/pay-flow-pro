@@ -1,11 +1,11 @@
-# Databutton app
+# Pay Flow Pro
 
-This project consists of a FastAPI backend server and a React + TypeScript frontend application exported from Databutton.
+This project contains a FastAPI backend and a React + TypeScript frontend. It was originally built with Databutton but is now structured to run on Vercel.
 
 ## Stack
 
-- React+Typescript frontend with `yarn` as package manager.
-- Python FastAPI server with `uv` as package manager.
+- React+TypeScript frontend using `yarn`.
+- Python FastAPI server running on Vercel's Python runtime.
 
 ## Quickstart
 
@@ -15,12 +15,28 @@ This project consists of a FastAPI backend server and a React + TypeScript front
 make
 ```
 
-2. Start the backend and frontend servers in separate terminals:
+2. Start the backend and frontend servers locally:
 
 ```bash
 make run-backend
 make run-frontend
 ```
+
+3. Build the frontend for production:
+
+```bash
+yarn --cwd frontend build
+```
+
+## Deployment on Vercel
+
+The project includes a `vercel.json` configuration. Vercel will build the frontend using the script above and expose the FastAPI app as a Serverless Function. Simply run:
+
+```bash
+vercel deploy
+```
+
+and follow the prompts.
 
 ## Gotchas
 
