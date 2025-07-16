@@ -4,7 +4,9 @@
       "src": "frontend/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "dist"
+        "distDir": "dist",
+        "installCommand": "corepack yarn install --immutable",
+        "buildCommand": "corepack yarn build"
       }
     },
     {
@@ -15,11 +17,6 @@
       }
     }
   ],
-  "functions": {
-    "backend/**/*.py": {
-      "runtime": "python3.11"
-    }
-  },
   "rewrites": [
     {
       "source": "/api/(.*)",
