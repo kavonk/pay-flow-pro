@@ -1,27 +1,27 @@
-# Workspace version: 1.46.32
-databutton==0.38.34
-ipykernel==6.29.5
-fastapi==0.115.12
-python-multipart==0.0.9
+# Core
+fastapi==0.115.2
 uvicorn[standard]==0.34.2
-
-openai
-beautifulsoup4
-requests
-asyncpg
+python-multipart==0.0.9
 pydantic[email]
-stripe
-Pillow
-apscheduler
-boto3
-selenium
-aiohttp
-pytest
-pytest-asyncio
-uvicorn[standard]==0.34.2
-ipykernel==6.29.5
-fastapi==0.115.12
-databutton==0.38.34
-python-multipart==0.0.9
 sqlalchemy
 psycopg2-binary
+asyncpg
+aiohttp
+apscheduler
+boto3
+stripe
+Pillow
+openai
+requests
+beautifulsoup4
+selenium
+
+# Testing
+pytest
+pytest-asyncio
+
+# Optional: Only if you're using notebooks
+ipykernel==6.29.5
+
+# IMPORTANT: Pin this version to stay on Python 3.11
+databutton==0.27.7
