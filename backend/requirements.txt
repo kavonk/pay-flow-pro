@@ -1,27 +1,24 @@
 # Core
-fastapi==0.115.2
-uvicorn[standard]==0.34.2
+fastapi==0.110.0
+uvicorn[standard]==0.29.0
 python-multipart==0.0.9
-pydantic[email]
-sqlalchemy
-psycopg2-binary
-asyncpg
-aiohttp
-apscheduler
-boto3
-stripe
-Pillow
-openai
-requests
-beautifulsoup4
-selenium
+pydantic[email]==1.10.13
+sqlalchemy==2.0.30
+psycopg2-binary==2.9.9
+asyncpg==0.29.0
+aiohttp==3.9.5
+apscheduler==3.10.4
+boto3==1.34.116
+stripe==9.7.0
+Pillow==10.3.0
+openai==1.30.1
+requests==2.31.0
+beautifulsoup4==4.12.3
+selenium==4.21.0
 
 # Testing
-pytest
-pytest-asyncio
+pytest==8.2.2
+pytest-asyncio==0.23.6
 
-# Optional: Only if you're using notebooks
+# Optional: Jupyter support
 ipykernel==6.29.5
-
-# IMPORTANT: Pin this version to stay on Python 3.11
-databutton==0.27.7
