@@ -10,5 +10,11 @@
   },
   "dependencies": {
     "@napi-rs/canvas": "^0.1.74"
+  },
+  "resolutions": {
+    "canvas": "3.0.0"
+  },
+  "scripts": {
+    "preinstall": "npm config set canvas_binary_host_mirror= && npm config set canvas_prebuilt_binary_host= && npm config set canvas_download_host="
   }
 }
