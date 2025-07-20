@@ -7,5 +7,8 @@
   "packageManager": "yarn@4.9.2",
   "engines": {
     "python": "3.11"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^0.1.74"
   }
 }
